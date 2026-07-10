@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>마음 거리두기 워크북</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0F2EC;          /* 연한 세이지 종이 */
+  --card:#FFFFFF;
+  --ink:#27352E;         /* 딥그린 잉크 */
+  --ink-soft:#5C6B62;
+  --line:#DCE3D8;
+  --green:#3E5C50;       /* 프라이머리 */
+  --green-soft:#E4EBE2;
+  --amber:#B4552D;       /* 포인트(절제 사용) */
+  --amber-soft:#F4E7DD;
+  --danger:#A93F2E;
+  --radius:16px;
+  --display:'Gowun Batang', serif;
+  --body:'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--body); background:var(--bg); color:var(--ink);
+  font-size:15.5px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+#app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;position:relative}
+header{
+  padding:22px 20px 10px; display:flex; align-items:baseline; justify-content:space-between;
+}
+header h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.02em}
+header .streak{font-size:13px;color:var(--ink-soft)}
+header .streak b{color:var(--amber);font-weight:700}
+main{flex:1;padding:6px 20px 96px}
+/* ---------- 공통 컴포넌트 ---------- */
+.eyebrow{font-size:11.5px;letter-spacing:.14em;color:var(--green);font-weight:700;text-transform:uppercase;margin:22px 2px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.card h3{font-family:var(--display);font-size:16.5px;margin-bottom:6px;font-weight:700}
+.card p.desc{color:var(--ink-soft);font-size:13.5px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:12px;padding:12px 18px;font-family:var(--body);
+  font-size:14.5px;font-weight:600;cursor:pointer;transition:transform .08s ease, opacity .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-ghost{background:transparent;color:var(--green);border:1.5px solid var(--green)}
+.btn-soft{background:var(--green-soft);color:var(--green)}
+.btn-danger{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn-block{width:100%}
+.btn-sm{padding:8px 13px;font-size:13px;border-radius:10px}
+.chipwrap{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.chip{
+  border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
+  border-radius:999px;padding:7px 14px;font-size:13.5px;cursor:pointer;user-select:none;
+  transition:all .12s;
+}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+.chip.amber.on{background:var(--amber);border-color:var(--amber)}
+label.f{display:block;font-weight:700;font-size:14px;margin:18px 0 6px}
+label.f small{display:block;font-weight:400;color:var(--ink-soft);font-size:12.5px;margin-top:2px}
+textarea,input[type=text]{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;
+  font-family:var(--body);font-size:15px;background:#fff;color:var(--ink);resize:vertical;
+}
+textarea:focus,input[type=text]:focus{outline:none;border-color:var(--green)}
+textarea{min-height:84px}
+input[type=range]{width:100%;accent-color:var(--green);margin:10px 0 2px}
+.slider-val{font-family:var(--display);font-size:26px;font-weight:700;color:var(--green);text-align:center}
+.delta{
+  display:inline-flex;align-items:center;gap:7px;background:var(--green-soft);
+  border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700;color:var(--green)
+}
+.delta .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block}
+.delta .dot.after{background:var(--green);opacity:.85}
+.delta .tail{width:22px;height:2px;background:linear-gradient(90deg,var(--amber),var(--green));border-radius:2px}
+.pill{display:inline-block;background:var(--green-soft);color:var(--green);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;margin:2px 3px 2px 0}
+.pill.amber{background:var(--amber-soft);color:var(--amber)}
+.muted{color:var(--ink-soft);font-size:13px}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.empty{
+  text-align:center;padding:38px 16px;color:var(--ink-soft);font-size:14px;
+  border:1.5px dashed var(--line);border-radius:var(--radius);margin-top:8px
+}
+.empty .big{font-family:var(--display);font-size:17px;color:var(--ink);margin-bottom:6px}
+/* ---------- 탭바 ---------- */
+nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:520px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);display:flex;padding:6px 4px calc(8px + env(safe-area-inset-bottom));z-index:50;
+}
+nav button{
+  flex:1;background:none;border:none;font-family:var(--body);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10.5px;color:var(--ink-soft);padding:5px 0;font-weight:600;
+}
+nav button .ic{font-size:19px;line-height:1}
+nav button.on{color:var(--green)}
+nav button.on .ic{transform:translateY(-1px)}
+/* ---------- 모달 ---------- */
+#modal-root{position:fixed;inset:0;z-index:100;display:none}
+#modal-root.open{display:block}
+.modal-bg{position:absolute;inset:0;background:rgba(39,53,46,.42)}
+.modal{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:520px;
+  max-height:92%;overflow-y:auto;background:var(--bg);border-radius:22px 22px 0 0;
+  padding:20px 20px calc(28px + env(safe-area-inset-bottom));animation:up .22s ease;
+}
+@keyframes up{from{transform:translate(-50%,40px);opacity:.4}to{transform:translate(-50%,0);opacity:1}}
+.modal .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.modal .mhead h2{font-family:var(--display);font-size:18px;font-weight:700}
+.modal .x{background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:4px 8px}
+/* ---------- 토스트 ---------- */
+#toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:200;
+  background:var(--ink);color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;
+  opacity:0;pointer-events:none;transition:opacity .25s;max-width:86%;text-align:center;
+}
+#toast.show{opacity:1}
+/* ---------- 홈 ---------- */
+.hero{padding:8px 2px 2px}
+.hero .greet{font-family:var(--display);font-size:22px;font-weight:700;line-height:1.45}
+.hero .sub{color:var(--ink-soft);font-size:13.5px;margin-top:4px}
+.task{display:flex;align-items:center;gap:14px;cursor:pointer}
+.task .tic{
+  width:42px;height:42px;border-radius:13px;background:var(--green-soft);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0
+}
+.task.done{opacity:.55}
+.task .tbody{flex:1}
+.task .tbody b{font-size:14.5px}
+.task .tbody span{display:block;font-size:12.5px;color:var(--ink-soft)}
+.task .go{color:var(--green);font-weight:700;font-size:18px}
+/* ---------- 기록 ---------- */
+.entry-card{cursor:pointer}
+.entry-card .edate{font-size:12px;color:var(--ink-soft);margin-bottom:5px}
+.entry-card .esit{font-size:14.5px;font-weight:600;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.record-view b.k{display:block;font-size:12px;color:var(--green);letter-spacing:.08em;margin:16px 0 4px;font-weight:700}
+.record-view .v{white-space:pre-wrap}
+/* ---------- 배움 ---------- */
+.lesson-row{display:flex;align-items:center;gap:13px;padding:13px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.lesson-row:last-child{border-bottom:none}
+.lesson-row .num{
+  font-family:var(--display);width:34px;height:34px;border-radius:50%;
+  border:1.5px solid var(--green);color:var(--green);display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;flex-shrink:0
+}
+.lesson-row.done .num{background:var(--green);color:#fff}
+.lesson-row.locked{opacity:.4;cursor:default}
+.lesson-row.locked .num{border-color:var(--line);color:var(--ink-soft)}
+.lesson-row .lt{font-size:14.5px;font-weight:600}
+.lesson-row .lw{font-size:11.5px;color:var(--ink-soft)}
+.progressbar{height:7px;background:var(--green-soft);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.progressbar i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .4s}
+.lesson-body{font-size:15.5px}
+.lesson-body p{margin-bottom:14px}
+.keyline{
+  font-family:var(--display);font-size:16.5px;font-weight:700;color:var(--green);
+  border-left:3px solid var(--green);padding:6px 0 6px 14px;margin:20px 0;line-height:1.6
+}
+/* ---------- 훈련 ---------- */
+.breath-stage{display:flex;flex-direction:column;align-items:center;padding:26px 0 10px}
+.breath-circle{
+  width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 38% 32%, #DCE8DA, var(--green));
+  transition:transform 3.8s ease-in-out;display:flex;align-items:center;justify-content:center;
+  transform:scale(.72);box-shadow:0 8px 40px rgba(62,92,80,.25)
+}
+.breath-circle span{color:#fff;font-family:var(--display);font-size:17px;font-weight:700}
+.breath-meta{margin-top:22px;text-align:center}
+.breath-meta .phase-count{font-family:var(--display);font-size:32px;font-weight:700;color:var(--green)}
+.script-p{font-family:var(--display);font-size:17px;line-height:1.9;text-align:center;padding:26px 8px;min-height:170px;display:flex;align-items:center;justify-content:center;animation:fadein .8s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 14px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--green)}
+/* ---------- 마음체크 ---------- */
+.qitem{margin-bottom:18px}
+.qitem .qt{font-weight:600;font-size:14.5px;margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.opt{
+  border:1.5px solid var(--line);border-radius:10px;padding:8px 2px;text-align:center;
+  font-size:11.5px;cursor:pointer;background:#fff;color:var(--ink-soft)
+}
+.opt.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.score-big{font-family:var(--display);font-size:44px;font-weight:700;text-align:center;color:var(--green)}
+.crisis{
+  background:#FDF3F0;border:1.5px solid var(--danger);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px
+}
+.crisis b{color:var(--danger)}
+.crisis .tel{font-family:var(--display);font-size:21px;font-weight:700;color:var(--danger);margin:6px 0 2px}
+/* ---------- 통계 ---------- */
+canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.statbox{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.statbox .n{font-family:var(--display);font-size:23px;font-weight:700;color:var(--green)}
+.statbox .l{font-size:12px;color:var(--ink-soft);margin-top:2px}
+/* ---------- 온보딩 ---------- */
+#onboard{position:fixed;inset:0;background:var(--bg);z-index:300;overflow-y:auto;display:none}
+#onboard.open{display:block}
+#onboard .inner{max-width:520px;margin:0 auto;padding:56px 26px 40px}
+#onboard h1{font-family:var(--display);font-size:26px;line-height:1.5;margin-bottom:14px}
+#onboard .notice{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;font-size:13.5px;color:var(--ink-soft);margin:18px 0}
+#onboard .notice li{margin:6px 0 6px 18px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin:16px 0 22px;cursor:pointer}
+.agree input{margin-top:4px;accent-color:var(--green);width:17px;height:17px}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>마음 거리두기 워크북 <span id="syncbadge" style="font-size:13px"></span></h1>
+    <div class="streak" id="streak"></div>
+  </header>
+  <main id="view"></main>
+  <nav id="tabbar">
+    <button data-tab="home"><span class="ic">🏠</span>홈</button>
+    <button data-tab="records"><span class="ic">✏️</span>기록</button>
+    <button data-tab="learn"><span class="ic">📖</span>배움</button>
+    <button data-tab="train"><span class="ic">🌬️</span>훈련</button>
+    <button data-tab="stats"><span class="ic">📊</span>나의 변화</button>
+  </nav>
+</div>
+<div id="modal-root"><div class="modal-bg"></div><div class="modal" id="modal-body"></div></div>
+<div id="toast"></div>
+
+<div id="onboard">
+  <div class="inner">
+    <div class="eyebrow">MIND DISTANCING WORKBOOK</div>
+    <h1>생각과 나 사이,<br>한 걸음의 거리를 만듭니다.</h1>
+    <p style="color:var(--ink-soft)">인지행동치료(CBT)·수용전념치료(ACT) 등 공개된 근거 기반 기법으로 구성된 개인용 셀프케어 워크북입니다. 기록은 이 앱이, 코칭은 클로드가 함께합니다.</p>
+    <div class="notice">
+      <b style="color:var(--ink)">시작하기 전에 꼭 알아주세요</b>
+      <ul>
+        <li>이 앱은 교육·자기관리 목적의 도구이며, <b>의료기기나 심리치료가 아닙니다.</b></li>
+        <li>급성 위기, 정신병적 증상, 자살·자해 관련 문제가 있다면 이 앱보다 <b>정신건강 전문가의 도움</b>이 우선입니다. (자살예방 상담전화 109, 정신건강 상담전화 1577-0199 · 24시간)</li>
+        <li>기본적으로 모든 기록은 이 기기의 브라우저에만 저장됩니다. 클라우드 동기화를 켜면 기록이 <b>본인 Google 계정에 연결된 개인 서버 공간</b>에도 저장됩니다. 기기를 바꾸기 전에는 [나의 변화 → 데이터 관리]에서 백업하거나 동기화를 이용해주세요.</li>
+      </ul>
+    </div>
+    <label class="f">어떻게 불러드릴까요? <small>비워두어도 괜찮아요.</small></label>
+    <input type="text" id="ob-name" placeholder="예: 정우" maxlength="12">
+    <label class="agree"><input type="checkbox" id="ob-agree"><span>위 안내를 읽었고, 이 앱을 자기관리 도구로 사용하는 것에 동의합니다.</span></label>
+    <button class="btn btn-primary btn-block" id="ob-start">4주 여정 시작하기</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* =====================================================
+   ☁️ Firebase 설정 (선택)
+   - 비워두면: 지금처럼 이 기기의 브라우저에만 저장됩니다.
+   - Firebase 콘솔에서 받은 config를 아래에 붙여넣으면:
+     Google 로그인 버튼이 생기고, 기록이 서버에 자동 동기화됩니다.
+   예시:
+   const FIREBASE_CONFIG = {
+     apiKey: "AIza...", authDomain: "xxx.firebaseapp.com",
+     projectId: "xxx", storageBucket: "xxx.appspot.com",
+     messagingSenderId: "123", appId: "1:123:web:abc"
+   };
+===================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBx66_t9r3AmVeFxvgDU0z13EiERMqbATo",
+  authDomain: "mindpullness.firebaseapp.com",
+  projectId: "mindpullness",
+  storageBucket: "mindpullness.firebasestorage.app",
+  messagingSenderId: "834074782121",
+  appId: "1:834074782121:web:5fd7ca01ef1c5866c9fcb8"
+};
+
+/* =====================================================
+   데이터 상수
+===================================================== */
+const EMOTIONS = ["불안","우울","분노","수치심","죄책감","무기력","외로움","초조","서운함","허무","질투","긴장"];
+const BODIES = ["가슴 답답함","심장 두근거림","어깨·목 긴장","두통","소화불량","손떨림","얼굴 화끈거림","피로감","호흡 얕아짐"];
+const TRAPS = ["흑백사고","파국화","독심술","예언자적 사고","과잉일반화","낙인찍기","당위진술","감정적 추론","정신적 여과","개인화"];
+
+const PHQ9 = {
+  name:"PHQ-9 (우울)", max:27,
+  intro:"지난 2주 동안, 다음 문제들로 인해 얼마나 자주 방해를 받았나요?",
+  items:[
+    "일 또는 여가 활동을 하는 데 흥미나 즐거움을 느끼지 못했다",
+    "기분이 가라앉거나, 우울하거나, 희망이 없다고 느꼈다",
+    "잠들기 어렵거나 자주 깼다, 혹은 잠을 너무 많이 잤다",
+    "피곤하다고 느끼거나 기운이 거의 없었다",
+    "입맛이 없거나 과식을 했다",
+    "내 자신이 실패자로 여겨지거나, 자신과 가족을 실망시켰다고 느꼈다",
+    "신문을 읽거나 TV를 보는 것과 같은 일에 집중하기 어려웠다",
+    "다른 사람들이 알아챌 정도로 평소보다 말과 행동이 느려졌거나, 반대로 너무 안절부절못했다",
+    "차라리 죽는 것이 낫겠다고 생각하거나, 어떤 식으로든 스스로를 해치고 싶다는 생각이 들었다"
+  ],
+  bands:[[0,4,"최소 수준"],[5,9,"가벼운 수준"],[10,14,"중간 수준"],[15,19,"중간-심한 수준"],[20,27,"심한 수준"]]
+};
+const GAD7 = {
+  name:"GAD-7 (불안)", max:21,
+  intro:"지난 2주 동안, 다음 문제들로 인해 얼마나 자주 방해를 받았나요?",
+  items:[
+    "초조하거나 불안하거나 조마조마하게 느꼈다",
+    "걱정하는 것을 멈추거나 조절할 수가 없었다",
+    "여러 가지 것들에 대해 걱정을 너무 많이 했다",
+    "편하게 있기가 어려웠다",
+    "너무 안절부절못해서 가만히 있기가 힘들었다",
+    "쉽게 짜증이 나거나 쉽게 성을 내게 되었다",
+    "마치 끔찍한 일이 생길 것처럼 두렵게 느껴졌다"
+  ],
+  bands:[[0,4,"최소 수준"],[5,9,"가벼운 수준"],[10,14,"중간 수준"],[15,21,"심한 수준"]]
+};
+const OPT_LABELS = ["전혀 없음","며칠 동안","절반 이상","거의 매일"];
+
+/* ---------- 4주 28강 커리큘럼 ---------- */
+const WEEKS = ["생각과 나 사이의 거리","감정의 문법","생각의 함정과 재평가","가치와 행동"];
+const LESSONS = [
+{t:"왜 '거리두기'인가",b:["영화관 맨 앞줄, 스크린에 코를 박을 듯 앉아 있다고 상상해보세요. 화면이 시야 전부를 채우면 영화와 현실이 구분되지 않습니다. 무서운 장면에서는 심장이 뛰고, 슬픈 장면에서는 눈물이 납니다. 하지만 몇 줄 뒤로 물러나 앉는 순간, 우리는 알게 됩니다. '아, 이건 영화구나.'","우리의 생각도 똑같습니다. 생각 '속에' 있을 때 생각은 곧 현실처럼 느껴집니다. '나는 안 될 거야'라는 생각에 빠져 있으면, 그것은 생각이 아니라 이미 확정된 사실처럼 다가오죠. 거리두기(distancing)란 생각에서 몇 줄 뒤로 물러나 앉는 기술입니다. 생각을 없애는 것이 아니라, 생각을 '바라보는' 자리로 옮겨 앉는 것.","이 4주 동안 우리는 그 자리를 찾는 연습을 합니다. 생각과 싸우지 않고도 생각에 휘둘리지 않는 법을요."],
+k:"생각에 빠지는 것과 생각을 바라보는 것은 완전히 다른 일이다.",
+m:"오늘 감정이 크게 흔들리는 순간이 오면, 딱 한 번만 물어보세요. \"지금 나는 어떤 생각 속에 앉아 있지?\""},
+{t:"생각은 사건이 아니다",b:["비 오는 날, 두 사람이 같은 창밖을 봅니다. 한 사람은 '소풍 다 망쳤네'라고 생각하고, 다른 사람은 '빗소리 들으며 책 읽기 좋겠다'고 생각합니다. 비는 하나인데 마음속 날씨는 둘이죠. 무엇이 달랐을까요? 사건이 아니라 해석입니다.","우리는 사건과 생각을 자주 한 덩어리로 경험합니다. 하지만 둘은 다릅니다. 사건은 카메라에 찍히는 것, 생각은 마음이 그 위에 덧입힌 자막입니다. 자막은 틀릴 수 있고, 바뀔 수 있고, 여러 버전이 존재할 수 있습니다.","생각기록지의 첫 칸이 '상황'인 이유가 여기 있습니다. 카메라로 찍듯 사실만 적어보는 것. 그 순간 이미 사건과 해석 사이에 얇은 틈이 생깁니다. 거리두기는 그 틈에서 시작됩니다."],
+k:"사건은 카메라에 찍히는 것, 생각은 그 위에 덧입힌 자막이다.",
+m:"오늘 있었던 일 하나를 생각기록지에 적어보세요. '상황' 칸에는 카메라에 찍힐 사실만 담아보는 게 오늘의 연습입니다."},
+{t:"자동적 사고 — 머릿속의 자동 자막",b:["인사를 건넸는데 상대가 그냥 지나칩니다. 0.5초 만에 자막이 뜹니다. '나한테 화났나?' 우리가 자막을 '선택'했나요? 아닙니다. 저절로 떠올랐죠. 인지치료에서는 이를 자동적 사고(automatic thoughts)라고 부릅니다.","자동적 사고에는 세 가지 특징이 있습니다. 첫째, 빠릅니다. 생각했다는 자각도 없이 지나갑니다. 둘째, 습관적입니다. 비슷한 상황에서 비슷한 자막이 반복됩니다. 셋째, 그럴듯합니다. 검증 없이도 사실처럼 믿게 만듭니다.","좋은 소식은, 자동이라고 해서 불변은 아니라는 것입니다. 첫걸음은 단순합니다. 자막이 떴다는 걸 알아차리는 것. 포착되지 않은 생각은 다룰 수 없지만, 포착된 생각은 다룰 수 있습니다."],
+k:"포착되지 않은 생각은 나를 움직이고, 포착된 생각은 내가 다룰 수 있다.",
+m:"오늘 마음이 출렁인 순간의 '자동 자막'을 하나 포착해서 생각기록지의 '자동적 사고' 칸에 적어보세요."},
+{t:"팝콘 기계 비유",b:["마음은 팝콘 기계와 비슷합니다. 전원이 켜져 있는 한 팝콘은 계속 튀어나옵니다. 어떤 것은 고소하고, 어떤 것은 탔고, 어떤 것은 이상한 모양입니다. 우리가 주문한 적 없어도 기계는 멈추지 않죠.","생각도 그렇습니다. 하루 수만 개의 생각이 튀어나오는 것은 마음이 고장 나서가 아니라, 마음이 원래 그렇게 작동하기 때문입니다. 문제는 팝콘이 튀어나오는 것이 아니라, 튀어나온 모든 팝콘을 집어 먹어야 한다고 믿는 데 있습니다.","탄 팝콘이 나왔을 때 우리에게는 선택지가 있습니다. 집어 들고 씹으면서 '왜 이렇게 쓰지'라고 괴로워할 수도 있고, '탄 게 하나 나왔네' 하고 지나가게 둘 수도 있습니다. 생각을 통제할 수는 없어도, 어떤 생각과 함께 시간을 보낼지는 고를 수 있습니다."],
+k:"모든 생각이 튀어나오는 건 막을 수 없지만, 모든 생각을 집어 들 필요는 없다.",
+m:"오늘 떠오른 생각 중 '집어 들지 않고 지나가게 둔' 생각을 하나 기억해두었다가, 자기 전에 떠올려보세요."},
+{t:"흰곰 실험 — 억누를수록 커진다",b:["지금부터 30초간, 흰곰만은 절대 떠올리지 마세요. 어떤가요? 심리학자 다니엘 웨그너의 유명한 실험에서, '흰곰을 생각하지 말라'는 지시를 받은 사람들은 오히려 흰곰을 더 자주 떠올렸습니다. 억제하라는 지시가 그 생각을 더 크게 만든 것이죠.","이유는 단순합니다. '흰곰을 생각하면 안 돼'라는 감시 자체가 흰곰을 계속 마음에 소환하기 때문입니다. 괴로운 생각을 밀어내려는 노력은, 그 생각과 더 오래 씨름하게 만드는 역설을 낳습니다.","그래서 거리두기는 '지우기'가 아니라 '자리 옮기기'입니다. 생각을 없애려 애쓰는 대신, 한 걸음 물러나 '아, 그 생각이 또 왔구나'라고 이름을 붙여주는 것. 싸움을 멈추면 생각은 의외로 빨리 지나갑니다."],
+k:"생각과의 씨름을 멈추는 것이, 생각에서 벗어나는 가장 빠른 길이다.",
+m:"오늘 밀어내고 싶은 생각이 떠오르면, 밀어내는 대신 속으로 이름을 붙여보세요. \"○○ 생각이 또 왔네.\""},
+{t:"언어로 거리 만들기",b:["다음 두 문장을 소리 내어 읽어보세요. \"나는 실패자다.\" 그리고 \"나는, '나는 실패자다'라는 생각을 하고 있다.\" 내용은 같은데 무게가 다르지 않나요?","첫 문장에서 나와 생각은 한 몸입니다. 두 번째 문장에서 나는 생각을 '가진' 사람이고, 생각은 내가 바라보는 대상이 됩니다. 수용전념치료(ACT)에서는 이를 인지적 탈융합(defusion)이라고 부릅니다. 딱 한 겹의 언어를 덧대는 것만으로 생각과 나 사이에 거리가 생깁니다.","한 단계 더 나아갈 수도 있습니다. \"나는, '나는 실패자다'라는 생각을 하고 있음을 알아차리고 있다.\" 문장이 길어질수록 생각은 작아지고, 바라보는 나는 커집니다."],
+k:"'나는 ~다'를 '나는 ~라는 생각을 하고 있다'로 바꾸는 순간, 거리가 생긴다.",
+m:"요즘 나를 무겁게 하는 생각 하나를 골라, \"나는 ~라는 생각을 하고 있다\" 형식으로 세 번 바꿔 말해보세요."},
+{t:"1주차 정리 — 첫 회고",b:["한 주 동안 우리는 거리두기의 뼈대를 세웠습니다. 생각은 사건이 아니라 자막이라는 것(2강), 자막은 자동으로 뜬다는 것(3강), 마음은 원래 생각을 튀겨내는 기계라는 것(4강), 억누르면 커지고(5강), 언어로 물러설 수 있다는 것(6강)까지.","이론은 여기까지면 충분합니다. 이제 필요한 것은 반복입니다. 자전거 타는 법을 글로 아는 것과 몸으로 아는 것이 다르듯, 거리두기도 기록을 통해 몸에 새겨집니다.","오늘은 첫 주간 회고의 날입니다. [나의 변화] 탭에서 '주간 회고 프롬프트'를 복사해 클로드 코치에게 가져가보세요. 이번 주 나의 기록에서 어떤 패턴이 보이는지, 코치의 눈을 빌려 살펴봅시다."],
+k:"거리두기는 아는 것이 아니라, 기록으로 몸에 새기는 것이다.",
+m:"[나의 변화] 탭 → '주간 회고 프롬프트 복사' → 클로드에게 붙여넣고 첫 회고를 나눠보세요."},
+{t:"감정은 적이 아니라 신호다",b:["화재경보기가 울리면 시끄럽고 불쾌합니다. 하지만 경보기를 부수는 사람은 없습니다. 경보기의 소음은 공격이 아니라 정보이기 때문입니다. 감정도 마찬가지입니다.","불안은 '위험할지 모르니 대비하라'는 신호, 분노는 '소중한 것이 침해당했다'는 신호, 슬픔은 '잃어버린 것이 있으니 돌보라'는 신호입니다. 감정 자체는 문제가 아닙니다. 오랜 진화가 우리에게 심어준, 조금 시끄러운 안전장치일 뿐이죠.","괴로움은 감정 자체보다, 감정에 대한 우리의 반응에서 자주 옵니다. '불안하면 안 되는데'라는 2차 반응이 원래의 불안 위에 불안을 한 겹 더 쌓습니다. 이번 주에는 감정을 끄려 하지 말고, 무엇을 알려주려는 신호인지 들어보는 연습을 합니다."],
+k:"감정은 꺼야 할 소음이 아니라, 읽어야 할 신호다.",
+m:"오늘 느낀 감정 하나를 골라 물어보세요. \"이 감정은 나에게 무엇을 알려주려는 걸까?\""},
+{t:"감정에 이름 붙이기",b:["안개 속 형체는 무섭지만, 그것이 나무라는 걸 아는 순간 두려움은 줄어듭니다. 감정도 이름이 없을 때 가장 큽니다. 심리학 연구들은 감정에 정확한 이름을 붙이는 것(정서 명명, affect labeling)만으로 감정 반응의 강도가 낮아진다는 것을 반복해서 보여주었습니다.","비결은 정확성입니다. '기분이 별로다'는 이름이 아니라 안개입니다. '서운함'인지 '수치심'인지 '초조함'인지 구별해 부르는 순간, 뭉뚱그려져 있던 감정 덩어리가 다룰 수 있는 크기로 나뉩니다.","생각기록지의 감정 칩이 여러 개인 이유가 이것입니다. '짜증' 하나로 퉁치고 싶을 때, 한 번 더 들여다보세요. 그 밑에 무엇이 있나요?"],
+k:"이름 붙일 수 있는 감정은 다룰 수 있는 감정이 된다.",
+m:"오늘 기록에서 감정 칩을 고를 때, 가장 먼저 떠오른 단어 말고 '더 정확한' 단어가 있는지 한 번 더 살펴보세요."},
+{t:"감정의 파도",b:["바다의 파도는 반드시 올라오고, 반드시 내려갑니다. 정점에 영원히 머무는 파도는 없습니다. 감정도 파도의 물리학을 따릅니다. 아무리 강한 감정도 생리적으로 정점을 유지할 수 없어서, 시간이 지나면 내려오게 되어 있습니다.","문제는 파도의 정점에서 우리가 내리는 판단입니다. '이 감정은 영원할 거야', '더 커지기만 할 거야'. 하지만 기록을 쌓아보면 알게 됩니다. 그 판단은 파도 위에서만 참처럼 보이는 착시라는 것을.","서핑하는 사람은 파도와 싸우지 않습니다. 파도가 올라올 때 올라타고, 내려갈 때 함께 내려옵니다. 감정 강도를 기록 전후로 두 번 재는 이유가 여기 있습니다. 파도가 실제로 내려온다는 증거를 내 데이터로 모으는 것이죠."],
+k:"모든 감정의 파도는 정점을 지나면 반드시 내려온다.",
+m:"강한 감정이 올라오면 강도를 기록해두고, 10분 뒤 다시 재보세요. 숫자가 말해주는 것을 확인해봅시다."},
+{t:"몸이 먼저 안다",b:["긴장하면 어깨가 굳고, 불안하면 가슴이 답답해지고, 화가 나면 얼굴이 뜨거워집니다. 흥미로운 점은 순서입니다. 많은 경우 몸의 반응이 '내가 지금 불안하구나'라는 자각보다 먼저 옵니다. 몸은 마음의 가장 빠른 알림판입니다.","그래서 몸의 신호를 읽는 능력은 거리두기의 조기경보 시스템이 됩니다. 어깨가 굳는 것을 알아차리는 순간, '아, 지금 내 마음에 무언가 지나가고 있구나'를 감정에 완전히 휩쓸리기 전에 알 수 있으니까요.","생각기록지에 신체반응 칸이 있는 이유입니다. 기록이 쌓이면 나만의 패턴이 보입니다. 나는 불안할 때 주로 어디가 먼저 반응하는 사람인지. 그 부위가 나의 경보기입니다."],
+k:"몸의 신호는 감정보다 먼저 도착하는 마음의 전보다.",
+m:"오늘 한 번, 하던 일을 멈추고 30초간 몸을 훑어보세요. 어깨, 가슴, 배, 턱. 지금 어디에 힘이 들어가 있나요?"},
+{t:"회피의 함정",b:["발표가 무서워 발표를 피하면, 그 순간은 편안해집니다. 회피는 즉시 효과가 있는 진통제거든요. 하지만 진통제에는 청구서가 따라옵니다. 피할수록 '발표는 역시 위험한 것'이라는 학습이 강해지고, 다음 발표는 더 무서워집니다.","더 큰 비용은 삶의 반경입니다. 불안을 피해 하나를 포기하고, 또 하나를 포기하다 보면, 어느새 삶이 아주 작은 원 안으로 줄어들어 있습니다. 회피가 지키는 것은 나의 안전이 아니라 불안의 영토입니다.","회피를 알아차리는 것이 시작입니다. 자책하기 위해서가 아니라, 지도를 그리기 위해서요. 내가 무엇을 피하고 있는지 알아야, 어디부터 반경을 넓힐지 정할 수 있습니다."],
+k:"회피는 지금의 불편을 줄이는 대신, 삶의 반경을 줄인다.",
+m:"요즘 내가 피하고 있는 것(사람, 장소, 일, 대화)을 하나만 솔직하게 적어보세요. 아직 맞설 필요는 없습니다. 지도에 표시만 해두세요."},
+{t:"기꺼이 경험하기",b:["수용(acceptance)이라는 말은 오해받기 쉽습니다. 포기, 체념, '어쩔 수 없지'와 비슷하게 들리니까요. 하지만 심리학에서의 수용은 정반대로 능동적인 태도입니다. 불편한 감정이 왔을 때, 도망가지도 싸우지도 않고 '그래, 있어도 돼'라고 자리를 내어주는 것.","차가운 바다에 들어갈 때를 떠올려보세요. 몸에 힘을 잔뜩 주고 저항하면 물은 더 차갑고 고통스럽습니다. 힘을 빼고 '차갑구나' 하고 받아들이면, 같은 온도가 견딜 만해집니다. 물의 온도는 그대로인데 경험이 달라지는 것이죠.","기꺼이 경험하기는 감정을 좋아하라는 뜻이 아닙니다. 감정과 함께 있으면서도 내가 하려던 일을 계속할 수 있다는 것, 그것이 수용이 주는 자유입니다."],
+k:"수용은 항복이 아니라, 감정에게 자리를 내주고 내 길을 계속 가는 것이다.",
+m:"불편한 감정이 올라오면 1분만 그대로 느껴보세요. [훈련] 탭의 호흡 훈련과 함께해도 좋습니다."},
+{t:"2주차 정리 — 나의 감정 데이터",b:["이번 주 우리는 감정의 문법을 배웠습니다. 감정은 신호이고(8강), 이름을 붙이면 작아지고(9강), 파도처럼 반드시 내려오며(10강), 몸이 먼저 알려주고(11강), 피하면 커지지만(12강), 자리를 내주면 함께 갈 수 있다는 것(13강).","이제 이론을 데이터로 확인할 시간입니다. [나의 변화] 탭에 가면 지금까지의 기록이 숫자로 정리되어 있습니다. 나에게 가장 자주 찾아온 감정은 무엇이었나요? 거리두기 후 감정 강도는 평균 몇 점이나 내려갔나요?","자신의 마음을 데이터로 본다는 것은 그 자체로 거리두기입니다. 감정 '속에서' 보던 것을, 감정 '밖에서' 조망하는 일이니까요."],
+k:"나의 감정을 데이터로 본다는 것 자체가 이미 거리두기다.",
+m:"[나의 변화] 탭에서 '자주 만난 감정 TOP 3'를 확인하고, 예상과 같았는지 달랐는지 생각해보세요."},
+{t:"생각의 함정 ① 흑백사고",b:["'완벽하지 않으면 실패야.' '내 편 아니면 적이야.' 세상을 두 가지 색으로만 칠하는 이 습관을 흑백사고(이분법적 사고)라고 부릅니다. 판단이 빨라진다는 장점이 있지만, 대가가 큽니다. 현실의 대부분은 흑과 백 사이의 넓은 회색지대에 있기 때문입니다.","흑백사고의 신호 단어들이 있습니다. '항상', '절대', '전부', '완전히', '아무도'. 이 단어들이 생각 속에 등장하면 잠깐 멈출 신호입니다. 정말 '항상' 그랬나요? 단 한 번의 예외도 없이?","해독제는 회색의 어휘를 되찾는 것입니다. 0점과 100점 사이에 30점도, 60점도, 85점도 있다는 것. 오늘 발표가 완벽하지 않았다면, 그것은 0점이 아니라 몇 점이었을까요?"],
+k:"'항상'과 '절대'가 등장하면, 회색지대가 지워지고 있다는 신호다.",
+m:"오늘의 생각기록에서 '항상, 절대, 전부, 완전히' 같은 단어를 찾아보고, 있다면 몇 점짜리 회색이었는지 다시 매겨보세요."},
+{t:"생각의 함정 ② 파국화",b:["보고서에 오타 하나를 발견합니다. '팀장님이 실망하겠지 → 평가가 나빠지겠지 → 결국 여기서 버티지 못할 거야.' 5분 만에 오타 하나가 인생의 위기가 되었습니다. 이것이 파국화(catastrophizing), 최악의 시나리오로 직행하는 마음의 급행열차입니다.","파국화의 트릭은 '가능성'을 '확실성'으로 바꿔치기하는 데 있습니다. 최악의 일은 논리적으로 가능하긴 합니다. 하지만 가능하다는 것과 일어난다는 것은 전혀 다른 문제죠.","급행열차를 세우는 질문 두 가지가 있습니다. 첫째, \"실제로 일어날 확률은 몇 %일까?\" 둘째, \"만약 정말 일어난다면, 나는 정말 아무것도 할 수 없을까?\" 대부분의 경우, 확률은 생각보다 낮고 대처 능력은 생각보다 높습니다."],
+k:"파국화는 '일어날 수 있다'를 '일어날 것이다'로 바꿔치기하는 속임수다.",
+m:"최악의 시나리오가 떠오르면 두 가지를 적어보세요. 실제 확률(%), 그리고 그 일이 일어났을 때 내가 할 수 있는 일 한 가지."},
+{t:"생각의 함정 ③ 독심술과 예언",b:["'저 사람 표정을 보니 나를 무시하는 게 분명해.' 상대의 마음을 읽었다고 확신하는 것이 독심술(mind reading)입니다. '이번 면접은 어차피 떨어질 거야.' 미래를 이미 본 것처럼 구는 것이 예언자적 사고(fortune telling)입니다.","둘의 공통점은 증거 없이 결론에 도착한다는 것입니다. 상대의 무표정에는 수십 가지 이유가 있을 수 있습니다. 피곤해서, 딴생각 중이라서, 원래 표정이 그래서. 그런데 마음은 하필 나와 관련된 최악의 해석 하나를 골라 '팩트'라고 도장을 찍습니다.","해독제는 기자의 태도입니다. 기자는 추측을 기사로 쓰지 않습니다. \"그렇게 판단할 근거가 뭐지?\" \"다른 설명은 없을까?\" 확인되지 않은 마음과 미래는, 아직 기사가 아니라 가설입니다."],
+k:"타인의 마음과 나의 미래는, 증거가 확인되기 전까지는 가설일 뿐이다.",
+m:"누군가의 마음을 확신하게 되는 순간, 물어보세요. \"내가 그렇게 판단한 증거는 무엇이고, 다른 설명은 없을까?\""},
+{t:"생각의 함정 ④ 과잉일반화와 낙인",b:["한 번의 실수에서 '나는 늘 이래'라는 법칙을 만들어내는 것이 과잉일반화입니다. 점 하나를 찍고 선이라고 우기는 셈이죠. 여기서 한 발 더 나가면 낙인찍기가 됩니다. '실수를 했다'가 아니라 '나는 실패자다'. 행동에 대한 서술이 존재에 대한 판결로 바뀌는 순간입니다.","낙인이 위험한 이유는 반증이 불가능하기 때문입니다. '오늘 지각했다'는 내일 고칠 수 있지만, '나는 게으른 인간이다'는 어디서부터 손대야 할지조차 알 수 없습니다. 낙인은 변화의 문을 잠급니다.","해독제는 판결문을 행동 서술로 되돌리는 것입니다. '나는 무능하다' 대신 '이번 과제에서 두 가지 실수를 했다'. 서술은 구체적일수록 다룰 수 있는 것이 됩니다."],
+k:"행동은 고칠 수 있지만, 낙인은 고칠 수조차 없다. 판결 대신 서술로.",
+m:"스스로에게 붙인 낙인 하나('나는 ~한 인간이야')를 골라, 구체적인 행동 서술 한 문장으로 바꿔 적어보세요."},
+{t:"증거 재판 — 소크라테스식 질문",b:["소크라테스는 답을 가르치는 대신 질문을 던졌습니다. 좋은 질문은 스스로 답을 발견하게 만든다는 것을 알았기 때문이죠. 인지치료는 이 방법을 생각 검증에 씁니다. 괴로운 생각을 피고석에 앉히고, 재판을 여는 것입니다.","재판의 규칙은 공정함입니다. 검사 측 증거(이 생각을 지지하는 사실)와 변호인 측 증거(반대되는 사실)를 모두 듣습니다. 주의할 점이 하나 있습니다. 증거는 '사실'이어야 합니다. '그런 느낌이 들어서'는 증거로 채택되지 않습니다. 느낌은 증언일 뿐, 물증이 아닙니다.","재판이 끝나면 대개 판결은 무죄도 유죄도 아닌 '수정 기소'가 됩니다. '나는 늘 실패한다'는 '이번 건은 준비가 부족했다' 정도로. 그 정도의 수정만으로도 감정의 무게는 크게 달라집니다."],
+k:"느낌은 증거가 아니다. 생각을 재판할 때는 사실만 채택하라.",
+m:"오늘 생각기록 STEP 2의 첫 질문(사실인가 생각인가, 근거와 반대 근거)을 재판하듯 정성껏 작성해보세요."},
+{t:"친구에게 말하듯",b:["가까운 친구가 시험에 떨어져 '나는 쓸모없는 인간이야'라고 말한다면, 뭐라고 답하시겠어요? 아마 이렇게는 말하지 않을 겁니다. '맞아, 넌 쓸모없어.' 우리는 친구에게 자연스럽게 공정하고, 다정하고, 균형 잡힌 말을 건넵니다.","이상한 것은 그다음입니다. 같은 상황의 나에게는 정반대의 말을 합니다. 친구에게라면 절대 하지 않을 가혹한 말을, 스스로에게는 아무렇지 않게 하죠. 자기비판이 나를 채찍질해 성장시킨다고 믿지만, 연구들은 반대를 가리킵니다. 자기자비(self-compassion)가 높은 사람이 실패 후에 더 잘 회복하고 더 오래 도전합니다.","관점 전환의 질문은 간단합니다. \"가장 아끼는 친구가 지금의 나와 같은 생각을 말한다면, 나는 뭐라고 해줄까?\" 그 대답이, 대개 지금 나에게 필요한 말입니다."],
+k:"친구에게 해줄 말과 나에게 하는 말의 간격이, 내가 만들어야 할 거리다.",
+m:"오늘 생각기록 STEP 2의 두 번째 질문(친구라면 뭐라고 해줄까)을 실제 친구의 얼굴을 떠올리며 작성해보세요."},
+{t:"3주차 정리 — 재평가의 힘",b:["이번 주 우리는 생각의 함정 여섯 가지(흑백사고, 파국화, 독심술, 예언자적 사고, 과잉일반화, 낙인찍기)를 배우고, 두 가지 해독제(증거 재판, 친구의 관점)를 익혔습니다.","함정의 이름을 아는 것은 생각보다 강력합니다. 이름 없는 함정에는 계속 빠지지만, 이름 붙은 함정은 입구에서 알아볼 수 있으니까요. '아, 이거 파국화 열차구나' 하고 알아차리는 순간, 이미 반쯤 내린 것입니다.","[나의 변화] 탭에서 두 가지를 확인해보세요. 내가 자주 걸리는 함정 TOP 3, 그리고 거리두기 전후의 감정 강도 변화. 재평가가 실제로 효과가 있는지, 나의 데이터가 증언해줄 것입니다."],
+k:"이름 붙은 함정에는 빠지기 어렵다. 알아차림이 절반이다.",
+m:"[나의 변화] 탭에서 평균 강도 변화를 확인하고, 주간 회고 프롬프트로 클로드 코치와 3주차를 돌아보세요."},
+{t:"기분이 아니라 가치를 따라",b:["버스 기사가 승객들의 고함에 따라 노선을 바꾼다면, 버스는 영영 목적지에 닿지 못합니다. ACT에는 유명한 '버스 승객' 비유가 있습니다. 나는 내 삶이라는 버스의 기사이고, 불안·자기의심·귀찮음 같은 생각과 감정은 뒷좌석의 시끄러운 승객들입니다.","승객들을 버스에서 쫓아낼 수는 없습니다(흰곰 실험을 기억하시죠). 하지만 핸들은 승객이 아니라 기사의 손에 있습니다. '불안하니까 안 갈래'는 승객에게 핸들을 넘기는 일입니다. '불안하지만, 이건 나에게 중요하니까 간다'가 기사의 운전입니다.","기분이 좋아지면 움직이겠다는 계획은 자주 실패합니다. 순서가 반대이기 때문입니다. 방향은 기분이 아니라 가치가 정하고, 기분은 대개 움직인 뒤에 따라옵니다."],
+k:"기분은 시끄러운 승객일 뿐, 핸들은 언제나 내 손에 있다.",
+m:"오늘, 기분이 따라주지 않아도 '나에게 중요해서' 하는 행동을 하나만 해보세요. 아주 작아도 좋습니다."},
+{t:"나의 가치 나침반",b:["목표와 가치는 다릅니다. 목표는 도착지이고, 가치는 방향입니다. '이직 성공'은 목표라서 달성하면 끝나지만, '배우며 성장하는 사람이 되기'는 가치라서 평생 걸을 수 있는 방향입니다. 목표는 실패할 수 있지만, 방향은 실패하지 않습니다. 서쪽으로 걷는 데 실패하는 사람은 없으니까요.","가치를 찾는 질문들이 있습니다. 나는 어떤 사람으로 기억되고 싶은가? 시간 가는 줄 모르고 하게 되는 일은 무엇인가? 최근에 '이건 정말 잘했다' 싶었던 선택은 어떤 가치를 향해 있었나?","가치가 선명한 사람은 힘든 감정 앞에서도 길을 잃지 않습니다. 파도가 아무리 쳐도, 나침반은 계속 같은 곳을 가리키니까요."],
+k:"목표는 도착하면 끝나지만, 가치는 평생 걸을 수 있는 방향이다.",
+m:"이 강의 아래 '가치 나침반' 칸에, 내가 향하고 싶은 방향을 한두 문장으로 적어보세요."},
+{t:"행동이 기분을 바꾼다",b:["무기력할 때 우리는 기다립니다. '에너지가 생기면 그때 해야지.' 하지만 행동활성화(Behavioral Activation) 연구들이 보여주는 순서는 반대입니다. 동기가 행동을 만드는 것이 아니라, 행동이 동기를 만듭니다. 시동은 걸어야 배터리가 충전되는 것이죠.","비결은 시작의 크기입니다. '운동하기'는 무겁지만 '운동화 신고 문 앞까지 가기'는 가볍습니다. 뇌는 일단 시작된 일을 계속하려는 관성이 있어서, 5분짜리 시작이 30분의 활동으로 이어지는 경우가 많습니다. 설령 5분에서 끝나도, 0분보다는 언제나 낫습니다.","우울과 무기력의 악순환(기분 저하 → 활동 감소 → 성취·즐거움 감소 → 더 깊은 저하)을 끊는 지점은 '기분'이 아니라 '활동'입니다. 그곳이 우리가 직접 손댈 수 있는 유일한 고리이기 때문입니다."],
+k:"동기를 기다리지 말 것. 시동은 걸어야 배터리가 충전된다.",
+m:"지금 이 강의를 닫자마자 할 수 있는 5분짜리 활동 하나를 정하고, 바로 실행해보세요."},
+{t:"가치 기반 작은 계획",b:["가치는 방향이고, 행동은 걸음입니다. 이제 둘을 연결할 차례입니다. 어제 적은 가치 나침반을 꺼내보세요. 그 방향으로 이번 주에 내디딜 수 있는 걸음은 무엇일까요?","좋은 계획의 조건은 세 가지입니다. 첫째, 작을 것. 실패가 어려울 만큼 작아야 합니다. 둘째, 구체적일 것. '운동하기'가 아니라 '수요일 저녁 8시, 20분 걷기'. 셋째, 가치와 연결될 것. 왜 하는지가 분명한 행동은 의지력이 덜 듭니다.","계획대로 되지 않는 날도 옵니다. 그날의 규칙은 하나입니다. 자책 금지, 그냥 다음 걸음. 나침반은 그대로 있으니, 다시 방향만 확인하고 걸으면 됩니다."],
+k:"실패가 어려울 만큼 작은 걸음이, 가장 멀리 가는 걸음이다.",
+m:"이 강의 아래 '이번 주 작은 계획' 칸에, 가치와 연결된 구체적인 행동 하나를 적어보세요."},
+{t:"힘든 날의 매뉴얼",b:["소방훈련은 불이 나기 전에 합니다. 불길 속에서는 침착한 판단이 어렵다는 걸 알기 때문이죠. 마음도 같습니다. 감정의 파도가 높은 날에는 4주간 배운 기술이 하나도 떠오르지 않을 수 있습니다. 그래서 파도가 잔잔한 오늘, 매뉴얼을 미리 써두는 것입니다.","힘든 날 카드에는 세 가지를 담습니다. ① 나의 조기 신호: 몸과 행동에 나타나는 경고등(예: 어깨 뭉침, 연락 회피). ② 그때 할 것: 가장 효과 있었던 도구 두세 개(예: 박스 호흡 3분, 생각기록 STEP 1만이라도). ③ 나에게 건넬 한 문장: 파도 위의 나에게 지금의 내가 보내는 말.","이 카드는 미래의 나에게 보내는 구조 키트입니다. 힘든 날, 생각할 필요 없이 꺼내 읽기만 하면 되도록."],
+k:"매뉴얼은 파도가 잔잔할 때 쓰는 것이다. 파도 위에서는 읽기만 하면 되도록.",
+m:"이 강의 아래 '힘든 날 카드' 칸에 세 가지(조기 신호 / 할 것 / 나에게 건넬 한 문장)를 적어두세요."},
+{t:"나만의 도구상자",b:["4주간 우리는 꽤 많은 도구를 모았습니다. 자동적 사고 포착, 팝콘 흘려보내기, '~라는 생각을 하고 있다' 어법, 감정 이름 붙이기, 파도 관찰, 신체 신호 읽기, 증거 재판, 친구의 관점, 버스 기사의 핸들, 5분 시동, 그리고 호흡 훈련까지.","모든 도구가 모든 사람에게 맞는 것은 아닙니다. 목수마다 손에 익는 연장이 다르듯, 나에게 유난히 잘 듣는 도구가 있었을 것입니다. 기록을 돌아보며 골라보세요. 감정 강도를 가장 크게 떨어뜨린 것은 어떤 도구였나요?","도구상자 정리의 기준은 화려함이 아니라 손에 익음입니다. 위기의 순간 자동으로 손이 가는 두세 개의 도구. 그것이 앞으로 평생 나와 함께 갈 나의 기술입니다."],
+k:"많은 도구보다, 손에 익은 두세 개의 도구가 나를 지킨다.",
+m:"가장 효과 있었던 도구 TOP 3를 골라, 클로드 코치에게 공유하고 왜 그것이 나에게 잘 맞았는지 이야기 나눠보세요."},
+{t:"수료 — 앞으로의 나에게",b:["28일 전, 우리는 영화관 맨 앞줄에서 시작했습니다. 생각과 현실이 구분되지 않는 자리에서요. 지금 당신은 몇 줄 뒤에 앉아 있습니다. 완벽하게는 아니어도, '아, 지금 생각 속에 있구나'를 알아차리는 순간들이 생겼다면 그것으로 충분합니다.","거리두기는 졸업이 없는 기술입니다. 앞으로도 파도는 올 것이고, 어떤 날은 다시 맨 앞줄에 끌려가 앉아 있을 것입니다. 괜찮습니다. 중요한 것은 자리를 빼앗기지 않는 것이 아니라, 빼앗겼다는 걸 알아차리고 다시 물러나 앉는 것이니까요. 이제 당신은 그 방법을 압니다.","마지막 미션은 회고입니다. 클로드 코치와 함께 4주를 돌아보고, 앞으로의 나에게 편지 한 통을 남겨보세요. 다음 파도가 왔을 때, 그 편지가 등대가 되어줄 것입니다."],
+k:"거리를 빼앗기지 않는 사람은 없다. 다시 물러나 앉을 줄 아는 사람이 있을 뿐.",
+m:"[나의 변화]의 주간 회고 프롬프트로 클로드 코치와 수료 회고를 나누고, 앞으로의 나에게 보내는 편지를 코치 노트에 남겨보세요."}
+];
+
+/* ---------- 훈련 콘텐츠 ---------- */
+const BREATHS = {
+  box:{name:"박스 호흡", desc:"4초씩 네 단계로, 마음의 속도를 늦춥니다", phases:[["들이쉬기",4,1],["멈추기",4,1],["내쉬기",4,.72],["멈추기",4,.72]]},
+  b478:{name:"4·7·8 호흡", desc:"긴 날숨으로 몸의 긴장을 풀어냅니다", phases:[["들이쉬기",4,1],["멈추기",7,1],["내쉬기",8,.72]]}
+};
+const SCRIPTS = {
+  leaf:{name:"생각 흘려보내기", desc:"강물 위 나뭇잎에 생각을 실어 보냅니다 · 약 5분", secs:27, paras:[
+    "편한 자세로 앉아 눈을 감거나, 시선을 부드럽게 내려놓습니다. 몇 번의 호흡으로 몸을 이 자리에 데려옵니다.",
+    "천천히 흐르는 강가에 앉아 있다고 상상해보세요. 강물 위로 나뭇잎들이 하나둘 떠내려옵니다.",
+    "이제 마음에 생각이 떠오르기를 기다립니다. 어떤 생각이든 좋습니다. 걱정도, 계획도, '아무 생각이 안 나네'라는 생각도.",
+    "생각이 떠오르면, 그 생각을 나뭇잎 위에 가만히 올려놓습니다. 그리고 나뭇잎이 물길을 따라 흘러가는 것을 지켜봅니다.",
+    "생각을 밀어 보내려 하지 마세요. 강물의 속도는 강물이 정합니다. 우리는 다만 지켜볼 뿐입니다.",
+    "어느새 생각 속에 빠져들어 강가를 떠나 있는 자신을 발견할 수 있습니다. 자연스러운 일입니다. 알아차렸다면, 그 알아차림을 칭찬하며 다시 강가로 돌아옵니다.",
+    "유난히 자꾸 돌아오는 나뭇잎이 있을 수 있습니다. 괜찮습니다. 돌아올 때마다 다시 올려놓으면 됩니다. 몇 번이든.",
+    "지금 이 순간에도 생각은 떠오르고, 잎에 실리고, 흘러갑니다. 나는 강물이 아니라, 강가에 앉아 있는 사람입니다.",
+    "이제 천천히 강가에서 일어납니다. 발바닥의 감각, 주변의 소리로 주의를 가져옵니다.",
+    "준비가 되면 눈을 뜹니다. 생각을 바라보던 이 자리는, 언제든 다시 돌아올 수 있습니다."
+  ]},
+  body:{name:"바디 스캔 (요약형)", desc:"몸의 감각을 순서대로 살펴봅니다 · 약 5분", secs:30, paras:[
+    "의자나 바닥에 편안히 자리를 잡습니다. 두어 번 깊게 숨을 쉬며 시작합니다.",
+    "주의를 발바닥으로 가져갑니다. 바닥에 닿은 느낌, 온도, 무게. 바꾸려 하지 말고 그저 느껴봅니다.",
+    "주의를 종아리와 무릎, 허벅지로 천천히 올립니다. 긴장이 있다면 '긴장이 있구나' 하고 알아차립니다.",
+    "이제 배와 가슴입니다. 숨이 들어오고 나갈 때마다 배가 오르내리는 것을 느껴봅니다.",
+    "어깨로 갑니다. 하루의 무게가 자주 쌓이는 곳입니다. 숨을 내쉬며 어깨가 아주 조금 내려가도록 허락해봅니다.",
+    "목과 턱, 그리고 얼굴. 미간과 턱에 들어간 힘을 알아차리고, 부드럽게 풀어봅니다.",
+    "마지막으로 머리끝까지 올라간 뒤, 몸 전체를 하나로 느껴봅니다. 발끝부터 머리까지, 여기 앉아 숨 쉬고 있는 몸.",
+    "몸은 언제나 현재에 있습니다. 생각이 과거와 미래를 오갈 때, 몸의 감각은 돌아올 자리가 되어줍니다.",
+    "천천히 손가락과 발가락을 움직여봅니다. 준비가 되면 눈을 뜹니다."
+  ]}
+};
+
+/* ---------- 코치 프롬프트 원칙 ---------- */
+const COACH_RULES = `당신은 인지치료 기반 셀프케어를 돕는 코치입니다. 아래 원칙을 지켜주세요.
+- 탈중심화(생각과 나를 분리해 바라보기)를 최우선 목표로 삼습니다.
+- 정답을 주기보다 소크라테스식 질문을 2~3개 던져 스스로 발견하게 돕습니다.
+- 생각의 함정(인지 왜곡)이 보이면 이름을 붙여 부드럽게 짚어줍니다.
+- 따뜻하되 감상적이지 않게, 분석적이되 차갑지 않게 반응합니다.
+- 감정을 먼저 타당화한 뒤 생각을 다룹니다.
+- 진단하거나 병명을 언급하지 않습니다.`;
+
+/* =====================================================
+   상태 관리
+===================================================== */
+const KEY = "mindwork_data";
+const DEFAULT = () => ({
+  version:1,
+  settings:{userName:"",startDate:todayStr(),onboardingDone:false,lastCheckDate:null},
+  entries:[], lessons:{completed:[],missionMemos:{}},
+  assessments:[], trainings:[], activityDates:[],
+  values:{compass:"",weeklyPlan:"",hardDayCard:""}
+});
+let S;
+function load(){ try{ const raw=localStorage.getItem(KEY); S = raw?JSON.parse(raw):DEFAULT(); }catch(e){ S=DEFAULT(); } }
+function save(){ S.updatedAt=Date.now(); localStorage.setItem(KEY, JSON.stringify(S)); scheduleCloudPush(); }
+function markActivity(){ const t=todayStr(); if(!S.activityDates.includes(t)){S.activityDates.push(t);} save(); renderStreak(); }
+
+/* =====================================================
+   ☁️ 클라우드 동기화 (Firebase · 선택 기능)
+   구조: 로컬 우선 저장 → 1.5초 뒤 서버로 미러링
+   문서 경로: workbooks/{내 UID} (보안 규칙으로 본인만 접근)
+===================================================== */
+const CLOUD_ON = !!(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId);
+let fbUser=null, docRef=null, pushTm=null;
+function cloudSetup(){
+  if(!CLOUD_ON) return;
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(()=>{});
+    firebase.auth().onAuthStateChanged(async u=>{
+      fbUser=u||null;
+      docRef=u?firebase.firestore().collection("workbooks").doc(u.uid):null;
+      if(u) await cloudPull();
+      renderSync();
+      if(currentTab==="stats" && S.settings.onboardingDone) renderStats();
+    });
+  }catch(e){ console.warn("firebase init:",e); }
+}
+async function cloudPull(){
+  try{
+    const snap=await docRef.get();
+    if(snap.exists && (snap.data().updatedAt||0)>(S.updatedAt||0)){
+      S=snap.data();
+      localStorage.setItem(KEY, JSON.stringify(S));
+      if(S.settings.onboardingDone){
+        document.getElementById("onboard").classList.remove("open");
+        renderStreak(); showTab(currentTab);
+      }
+      toast("☁️ 클라우드의 최신 기록을 불러왔어요");
+    } else {
+      await docRef.set(S); // 서버가 비었거나 로컬이 최신 → 업로드
+    }
+  }catch(e){ console.warn("cloud pull:",e); toast("동기화 연결에 문제가 있어요. 기록은 이 기기에 안전하게 저장돼요."); }
+}
+function scheduleCloudPush(){
+  if(!docRef) return;
+  clearTimeout(pushTm);
+  pushTm=setTimeout(()=>{ docRef.set(S).then(renderSync).catch(e=>console.warn("cloud push:",e)); },1500);
+}
+function cloudLogin(){
+  const p=new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(p).catch(()=>{
+    firebase.auth().signInWithRedirect(p).catch(()=>
+      toast("로그인에 실패했어요. Firebase 콘솔의 '승인된 도메인'에 이 사이트 주소가 등록되어 있는지 확인해주세요."));
+  });
+}
+function cloudLogout(){
+  firebase.auth().signOut().then(()=>toast("동기화를 껐어요. 기록은 이 기기에 그대로 남아 있어요."));
+}
+function renderSync(){
+  const el=document.getElementById("syncbadge");
+  if(el) el.textContent = (CLOUD_ON && fbUser) ? "☁️" : "";
+}
+
+/* ---------- 유틸 ---------- */
+const $ = s=>document.querySelector(s);
+function esc(str){ return String(str??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function todayStr(d=new Date()){ const p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
+function fmtDT(iso){ const d=new Date(iso); const p=n=>String(n).padStart(2,"0"); return `${d.getMonth()+1}월 ${d.getDate()}일 ${p(d.getHours())}:${p(d.getMinutes())}`; }
+function daysSince(dateStr){ const a=new Date(dateStr+"T00:00"), b=new Date(todayStr()+"T00:00"); return Math.round((b-a)/86400000); }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove("show"),2400); }
+function copyText(text, okMsg){
+  const done=()=>toast(okMsg||"복사했어요. 클로드에 붙여넣어 주세요 🤖");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else fallbackCopy(text,done);
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ toast("복사에 실패했어요. 길게 눌러 직접 복사해주세요."); }
+  document.body.removeChild(ta);
+}
+
+/* ---------- 모달 ---------- */
+let breathTimer=null, scriptTimer=null;
+function openModal(html){
+  stopPlayers();
+  $("#modal-body").innerHTML = html;
+  $("#modal-root").classList.add("open");
+  document.body.style.overflow="hidden";
+  return $("#modal-body");
+}
+function closeModal(){
+  stopPlayers();
+  $("#modal-root").classList.remove("open");
+  document.body.style.overflow="";
+}
+function stopPlayers(){ if(breathTimer){clearInterval(breathTimer);breathTimer=null;} if(scriptTimer){clearInterval(scriptTimer);scriptTimer=null;} }
+document.addEventListener("click",e=>{ if(e.target.classList.contains("modal-bg")||e.target.classList.contains("x")) closeModal(); });
+function mhead(title){ return `<div class="mhead"><h2>${esc(title)}</h2><button class="x" aria-label="닫기">✕</button></div>`; }
+
+/* =====================================================
+   라우팅
+===================================================== */
+let currentTab="home";
+function showTab(name){
+  currentTab=name;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===name));
+  ({home:renderHome,records:renderRecords,learn:renderLearn,train:renderTrain,stats:renderStats})[name]();
+  window.scrollTo(0,0);
+}
+$("#tabbar").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) showTab(b.dataset.tab); });
+
+function renderStreak(){
+  let streak=0; const set=new Set(S.activityDates);
+  for(let i=0;;i++){ const d=new Date(); d.setDate(d.getDate()-i); if(set.has(todayStr(d))) streak++; else { if(i===0) continue; break; } }
+  $("#streak").innerHTML = streak>0 ? `🔥 <b>${streak}</b>일 연속` : `오늘도 한 걸음`;
+}
+
+/* =====================================================
+   홈
+===================================================== */
+function unlockedDay(){ return Math.max(1, Math.min(28, daysSince(S.settings.startDate)+1)); }
+function checkDue(){ const last=S.settings.lastCheckDate; return !last || daysSince(last)>=14; }
+
+function renderHome(){
+  const name=S.settings.userName;
+  const h=new Date().getHours();
+  const timeGreet = h<6?"고요한 새벽이에요":h<12?"좋은 아침이에요":h<18?"좋은 오후예요":"차분한 저녁이에요";
+  const ud=unlockedDay();
+  const nextLesson = LESSONS.map((l,i)=>i+1).find(n=>n<=ud && !S.lessons.completed.includes(n));
+  const todayEntry = S.entries.some(e=>e.createdAt.slice(0,10)===todayStr());
+  const unfinished = S.entries.filter(e=>!e.step2);
+  const due = checkDue();
+
+  let tasks="";
+  if(nextLesson){
+    tasks+=`<div class="card task" onclick="openLesson(${nextLesson})">
+      <div class="tic">📖</div><div class="tbody"><b>오늘의 배움 · ${nextLesson}강</b><span>${esc(LESSONS[nextLesson-1].t)}</span></div><div class="go">›</div></div>`;
+  } else {
+    tasks+=`<div class="card task done"><div class="tic">📖</div><div class="tbody"><b>오늘의 배움</b><span>${ud>=28&&S.lessons.completed.length>=28?"4주 과정을 모두 마쳤어요 🎓":"열린 강의를 모두 들었어요. 내일 새 강의가 열려요."}</span></div></div>`;
+  }
+  tasks+=`<div class="card task ${todayEntry?'done':''}" onclick="openWizard()">
+    <div class="tic">✏️</div><div class="tbody"><b>생각기록 쓰기</b><span>${todayEntry?"오늘 기록을 남겼어요. 더 적어도 좋아요.":"마음이 출렁였던 순간을 붙잡아보세요"}</span></div><div class="go">›</div></div>`;
+  if(due){
+    tasks+=`<div class="card task" onclick="openAssessPick()">
+      <div class="tic">📋</div><div class="tbody"><b>마음 체크</b><span>2주에 한 번, 마음의 온도를 재볼 시간이에요</span></div><div class="go">›</div></div>`;
+  }
+  if(unfinished.length){
+    tasks+=`<div class="card task" onclick="openDetail('${unfinished[unfinished.length-1].id}')">
+      <div class="tic">🪁</div><div class="tbody"><b>거리두기 이어쓰기</b><span>STEP 2가 남은 기록이 ${unfinished.length}개 있어요</span></div><div class="go">›</div></div>`;
+  }
+
+  $("#view").innerHTML=`
+    <div class="hero">
+      <div class="greet">${name?esc(name)+"님, ":""}${timeGreet}.</div>
+      <div class="sub">생각과 나 사이, 오늘도 한 걸음의 거리를.</div>
+    </div>
+    <div class="eyebrow">오늘의 할 일</div>
+    ${tasks}
+    <div class="eyebrow">빠른 진정</div>
+    <div class="card task" onclick="openBreath('box')"><div class="tic">🌬️</div><div class="tbody"><b>박스 호흡 3분</b><span>지금 바로, 마음의 속도 늦추기</span></div><div class="go">›</div></div>
+  `;
+}
+
+/* =====================================================
+   생각기록 — 목록/마법사/상세
+===================================================== */
+function renderRecords(){
+  const list=[...S.entries].reverse();
+  let cards = list.map(e=>{
+    const emo=(e.emotions||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("");
+    const delta = e.step2 ? deltaBadge(e.intensity, e.step2.intensityAfter) : `<span class="pill amber">STEP 2 대기</span>`;
+    return `<div class="card entry-card" onclick="openDetail('${e.id}')">
+      <div class="edate">${fmtDT(e.createdAt)}</div>
+      <div class="esit">${esc(e.situation||"(상황 미입력)")}</div>
+      <div>${emo}</div><div style="margin-top:8px">${delta}</div>
+    </div>`;
+  }).join("");
+  if(!list.length) cards=`<div class="empty"><div class="big">아직 기록이 없어요</div>마음이 출렁였던 순간을 첫 페이지에 담아보세요.</div>`;
+  $("#view").innerHTML=`
+    <button class="btn btn-primary btn-block" onclick="openWizard()" style="margin-top:8px">＋ 새 생각기록 쓰기</button>
+    <div class="eyebrow">나의 기록 · ${list.length}</div>
+    ${cards}`;
+}
+function deltaBadge(before,after){
+  const d=before-after;
+  const word = d>0?`거리 +${d}`:(d===0?"강도 유지":`강도 +${-d}`);
+  return `<span class="delta"><span class="dot"></span><span class="tail"></span><span class="dot after"></span> ${before} → ${after} · ${word}</span>`;
+}
+
+/* ---------- STEP 1 마법사 ---------- */
+let draft=null;
+function openWizard(entryId){
+  draft = entryId ? S.entries.find(e=>e.id===entryId) : null;
+  const m=openModal(`
+    ${mhead("생각기록 · STEP 1 포착하기")}
+    <p class="muted">평가하지 말고, 카메라로 찍듯이. 다 채우지 않아도 괜찮아요.</p>
+    <label class="f">상황 <small>언제, 어디서, 무슨 일이 있었나요? 사실만 담아보세요.</small></label>
+    <textarea id="w-sit"></textarea>
+    <label class="f">자동적 사고 <small>그 순간 머릿속을 스친 생각(자막)은 무엇이었나요?</small></label>
+    <textarea id="w-tho"></textarea>
+    <label class="f">감정 <small>느꼈던 감정을 모두 골라주세요.</small></label>
+    <div class="chipwrap" id="w-emo">${EMOTIONS.map(e=>`<span class="chip" data-v="${e}">${e}</span>`).join("")}</div>
+    <input type="text" id="w-emo-etc" placeholder="목록에 없다면 직접 적어주세요" style="margin-top:6px">
+    <label class="f">감정 강도 <small>가장 강했던 감정 기준, 0(잔잔함)~100(압도됨)</small></label>
+    <div class="slider-val" id="w-int-val">50</div>
+    <input type="range" id="w-int" min="0" max="100" value="50" oninput="$('#w-int-val').textContent=this.value">
+    <label class="f">신체반응 <small>몸은 어떻게 반응했나요?</small></label>
+    <div class="chipwrap" id="w-body">${BODIES.map(e=>`<span class="chip" data-v="${e}">${e}</span>`).join("")}</div>
+    <label class="f">행동 <small>그래서 무엇을 했나요? 혹은 무엇을 피했나요?</small></label>
+    <textarea id="w-beh" style="min-height:64px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn btn-soft" style="flex:1" onclick="saveStep1(false)">여기까지 저장</button>
+      <button class="btn btn-primary" style="flex:1.4" onclick="saveStep1(true)">거리두기로 →</button>
+    </div>`);
+  m.querySelectorAll(".chipwrap .chip").forEach(c=>c.onclick=()=>c.classList.toggle("on"));
+}
+function saveStep1(goStep2){
+  const emos=[...document.querySelectorAll("#w-emo .chip.on")].map(c=>c.dataset.v);
+  const etc=$("#w-emo-etc").value.trim(); if(etc) emos.push(etc);
+  const sit=$("#w-sit").value.trim(), tho=$("#w-tho").value.trim();
+  if(!sit && !tho && !emos.length){ toast("상황·생각·감정 중 하나는 남겨주세요"); return; }
+  const e={
+    id:"e_"+Date.now(), createdAt:new Date().toISOString(),
+    situation:sit, thought:tho, emotions:emos,
+    intensity:+$("#w-int").value,
+    body:[...document.querySelectorAll("#w-body .chip.on")].map(c=>c.dataset.v),
+    behavior:$("#w-beh").value.trim(), step2:null, coachNote:""
+  };
+  S.entries.push(e); markActivity(); save();
+  if(goStep2) openStep2(e.id);
+  else { closeModal(); toast("기록을 저장했어요. STEP 2는 나중에 이어서 할 수 있어요."); if(currentTab==="records")renderRecords(); else renderHome(); }
+}
+
+/* ---------- STEP 2 ---------- */
+function openStep2(id){
+  const e=S.entries.find(x=>x.id===id); if(!e) return;
+  const m=openModal(`
+    ${mhead("생각기록 · STEP 2 거리두기")}
+    <div class="card" style="background:var(--green-soft);border:none">
+      <div class="muted" style="color:var(--green)">다루려는 생각</div>
+      <b>${esc(e.thought||e.situation||"기록된 생각")}</b>
+    </div>
+    <label class="f">Q1. 이것은 '사실'인가요, '생각'인가요? <small>지지하는 근거와 반대되는 근거를 재판하듯 적어보세요. 느낌은 증거가 아니에요.</small></label>
+    <textarea id="s2-q1"></textarea>
+    <label class="f">Q2. 가장 친한 친구가 같은 생각을 말한다면? <small>그 친구에게 나는 뭐라고 답해줄까요?</small></label>
+    <textarea id="s2-q2"></textarea>
+    <label class="f">Q3. 거리를 만드는 문장으로 바꿔 쓰기 <small>"나는 ~라는 생각을 하고 있다"의 형태로.</small></label>
+    <textarea id="s2-q3" style="min-height:64px"></textarea>
+    <label class="f">재평가된 생각 <small>지금 시점에서 더 균형 잡힌 관점은 무엇인가요?</small></label>
+    <textarea id="s2-re"></textarea>
+    <label class="f">발견한 생각의 함정 <small>해당되는 것이 있다면 골라주세요. (선택)</small></label>
+    <div class="chipwrap" id="s2-traps">${TRAPS.map(t=>`<span class="chip amber" data-v="${t}">${t}</span>`).join("")}</div>
+    <label class="f">지금의 감정 강도 <small>처음엔 <b>${e.intensity}</b>이었어요. 지금은 어떤가요?</small></label>
+    <div class="slider-val" id="s2-int-val">${e.intensity}</div>
+    <input type="range" id="s2-int" min="0" max="100" value="${e.intensity}" oninput="$('#s2-int-val').textContent=this.value">
+    <button class="btn btn-primary btn-block" style="margin-top:20px" onclick="saveStep2('${e.id}')">거리두기 완료</button>`);
+  m.querySelectorAll("#s2-traps .chip").forEach(c=>c.onclick=()=>c.classList.toggle("on"));
+}
+function saveStep2(id){
+  const e=S.entries.find(x=>x.id===id); if(!e) return;
+  e.step2={
+    q1:$("#s2-q1").value.trim(), q2:$("#s2-q2").value.trim(), q3:$("#s2-q3").value.trim(),
+    reappraisal:$("#s2-re").value.trim(),
+    intensityAfter:+$("#s2-int").value,
+    traps:[...document.querySelectorAll("#s2-traps .chip.on")].map(c=>c.dataset.v)
+  };
+  markActivity(); save(); closeModal();
+  const d=e.intensity-e.step2.intensityAfter;
+  toast(d>0?`거리두기 완료 · 감정 강도가 ${d}점 내려갔어요`:"거리두기 완료 · 기록이 저장됐어요");
+  openDetail(id);
+}
+
+/* ---------- 상세 ---------- */
+function openDetail(id){
+  const e=S.entries.find(x=>x.id===id); if(!e) return;
+  const s2=e.step2;
+  openModal(`
+    ${mhead("기록 자세히 보기")}
+    <div class="record-view">
+      <div class="muted">${fmtDT(e.createdAt)}</div>
+      <b class="k">상황</b><div class="v">${esc(e.situation)||"—"}</div>
+      <b class="k">자동적 사고</b><div class="v">${esc(e.thought)||"—"}</div>
+      <b class="k">감정 · 강도 ${e.intensity}</b><div>${(e.emotions||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")||"—"}</div>
+      <b class="k">신체반응</b><div>${(e.body||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")||"—"}</div>
+      <b class="k">행동</b><div class="v">${esc(e.behavior)||"—"}</div>
+      ${s2?`
+        <div class="divider"></div>
+        <b class="k">Q1 · 사실인가, 생각인가</b><div class="v">${esc(s2.q1)||"—"}</div>
+        <b class="k">Q2 · 친구에게라면</b><div class="v">${esc(s2.q2)||"—"}</div>
+        <b class="k">Q3 · 거리의 문장</b><div class="v">${esc(s2.q3)||"—"}</div>
+        <b class="k">재평가된 생각</b><div class="v">${esc(s2.reappraisal)||"—"}</div>
+        <b class="k">생각의 함정</b><div>${(s2.traps||[]).map(x=>`<span class="pill amber">${esc(x)}</span>`).join("")||"—"}</div>
+        <div style="margin-top:14px">${deltaBadge(e.intensity,s2.intensityAfter)}</div>
+      `:`
+        <div class="divider"></div>
+        <button class="btn btn-soft btn-block" onclick="openStep2('${e.id}')">🪁 STEP 2 거리두기 이어서 하기</button>
+      `}
+      <div class="divider"></div>
+      <button class="btn btn-primary btn-block" onclick="copyCoachPrompt('${e.id}')">🤖 클로드 코치에게 가져가기</button>
+      <p class="muted" style="margin-top:8px">버튼을 누르면 코치 지침 + 이 기록 + 최근 맥락이 복사돼요. 클로드 대화창에 붙여넣기만 하면 됩니다.</p>
+      <label class="f">코치 노트 <small>클로드의 피드백 중 간직할 문장을 붙여넣어 보관하세요.</small></label>
+      <textarea id="d-note">${esc(e.coachNote)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-soft" style="flex:1" onclick="saveNote('${e.id}')">노트 저장</button>
+        <button class="btn btn-danger btn-sm" onclick="delEntry('${e.id}')">기록 삭제</button>
+      </div>
+    </div>`);
+}
+function saveNote(id){ const e=S.entries.find(x=>x.id===id); if(!e)return; e.coachNote=$("#d-note").value.trim(); save(); toast("코치 노트를 저장했어요"); }
+function delEntry(id){
+  if(!confirm("이 기록을 삭제할까요? 되돌릴 수 없어요.")) return;
+  S.entries=S.entries.filter(x=>x.id!==id); save(); closeModal(); renderRecords(); toast("기록을 삭제했어요");
+}
+
+/* =====================================================
+   클로드 코치 프롬프트
+===================================================== */
+function contextSummary(){
+  const cut=Date.now()-14*86400000;
+  const recent=S.entries.filter(e=>new Date(e.createdAt)>cut);
+  const emoCount={};
+  recent.forEach(e=>(e.emotions||[]).forEach(x=>emoCount[x]=(emoCount[x]||0)+1));
+  const topEmo=Object.entries(emoCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]).join(", ")||"기록 없음";
+  const deltas=recent.filter(e=>e.step2).map(e=>e.intensity-e.step2.intensityAfter);
+  const avgD=deltas.length?Math.round(deltas.reduce((a,b)=>a+b,0)/deltas.length):null;
+  const lastP=[...S.assessments].reverse().find(a=>a.type==="PHQ9");
+  const lastG=[...S.assessments].reverse().find(a=>a.type==="GAD7");
+  return `- 최근 2주 생각기록: ${recent.length}건
+- 자주 등장한 감정: ${topEmo}
+- 거리두기(재평가) 후 감정 강도 변화: ${avgD===null?"데이터 없음":"평균 "+avgD+"점 감소"}
+- 최근 자가점검: PHQ-9 ${lastP?lastP.total+"점 ("+lastP.date+")":"미실시"} / GAD-7 ${lastG?lastG.total+"점 ("+lastG.date+")":"미실시"}
+- 배움 코스 진행: ${S.lessons.completed.length}/28강`;
+}
+function entryText(e){
+  const s2=e.step2;
+  return `[일시] ${fmtDT(e.createdAt)}
+[상황] ${e.situation||"-"}
+[자동적 사고] ${e.thought||"-"}
+[감정] ${(e.emotions||[]).join(", ")||"-"} (강도 ${e.intensity}/100)
+[신체반응] ${(e.body||[]).join(", ")||"-"}
+[행동] ${e.behavior||"-"}` + (s2?`
+[거리두기 Q1 · 근거와 반대 근거] ${s2.q1||"-"}
+[거리두기 Q2 · 친구에게라면] ${s2.q2||"-"}
+[거리두기 Q3 · 거리의 문장] ${s2.q3||"-"}
+[재평가된 생각] ${s2.reappraisal||"-"}
+[발견한 생각의 함정] ${(s2.traps||[]).join(", ")||"-"}
+[재평가 후 감정 강도] ${s2.intensityAfter}/100 (변화: ${e.intensity-s2.intensityAfter>0?"-":"+"}${Math.abs(e.intensity-s2.intensityAfter)})`:`
+[거리두기 STEP 2] 아직 작성하지 않음`);
+}
+function copyCoachPrompt(id){
+  const e=S.entries.find(x=>x.id===id); if(!e)return;
+  copyText(`${COACH_RULES}
+
+[나의 생각기록]
+${entryText(e)}
+
+[최근 맥락]
+${contextSummary()}
+
+이 기록에 대해 코치로서 피드백해주세요.`);
+}
+function copyWeeklyPrompt(){
+  const cut=Date.now()-7*86400000;
+  const week=S.entries.filter(e=>new Date(e.createdAt)>cut);
+  const trapCount={};
+  week.forEach(e=>e.step2&&(e.step2.traps||[]).forEach(t=>trapCount[t]=(trapCount[t]||0)+1));
+  const topTraps=Object.entries(trapCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]+"("+x[1]+"회)").join(", ")||"없음";
+  const trainMin=S.trainings.filter(t=>new Date(t.date)>cut).reduce((a,b)=>a+b.minutes,0);
+  const entriesBrief=week.map(e=>`· ${fmtDT(e.createdAt)} | 감정: ${(e.emotions||[]).join(",")||"-"} (${e.intensity}${e.step2?"→"+e.step2.intensityAfter:""}) | 생각: ${e.thought||e.situation||"-"}`).join("\n")||"(이번 주 기록 없음)";
+  copyText(`당신은 나의 셀프케어 코치입니다. 아래 원칙을 지켜주세요.
+${COACH_RULES.split("\n").slice(1).join("\n")}
+
+지난 한 주의 기록 요약을 보고
+1) 눈에 띄는 패턴 (반복되는 상황·감정·생각의 함정)
+2) 잘하고 있는 점 1가지
+3) 다음 주에 시도해볼 작은 실험 1가지
+를 제안해주세요. 조언은 짧고 실행 가능하게.
+
+[주간 요약]
+- 기록 수: ${week.length}건
+- 자주 걸린 생각의 함정: ${topTraps}
+- 훈련 시간: ${trainMin}분
+${contextSummary()}
+
+[이번 주 기록들]
+${entriesBrief}`,"주간 회고 프롬프트를 복사했어요 🤖");
+}
+function copyAssessPrompt(){
+  const rows=S.assessments.map(a=>`· ${a.date} | ${a.type==="PHQ9"?"PHQ-9":"GAD-7"} | ${a.total}점`).join("\n")||"(기록 없음)";
+  copyText(`아래는 나의 PHQ-9 / GAD-7 자가 점검 추이입니다. 점수 해석은 참고용임을 전제로,
+변화 추세에서 읽을 수 있는 점과 이번 주 셀프케어 포인트를 제안해주세요.
+진단은 하지 말아주세요.
+
+[점수 추이]
+${rows}`,"마음 체크 상담 프롬프트를 복사했어요 🤖");
+}
+
+/* =====================================================
+   배움 코스
+===================================================== */
+function renderLearn(){
+  const ud=unlockedDay();
+  const done=S.lessons.completed.length;
+  let rows="";
+  for(let w=0;w<4;w++){
+    rows+=`<div class="eyebrow">${w+1}주차 · ${esc(WEEKS[w])}</div><div class="card" style="padding:6px 14px">`;
+    for(let i=w*7;i<w*7+7;i++){
+      const n=i+1, l=LESSONS[i];
+      const locked=n>ud, isdone=S.lessons.completed.includes(n);
+      rows+=`<div class="lesson-row ${locked?'locked':''} ${isdone?'done':''}" ${locked?"":`onclick="openLesson(${n})"`}>
+        <div class="num">${isdone?"✓":n}</div>
+        <div><div class="lt">${esc(l.t)}</div><div class="lw">${locked?"🔒 "+(n-ud)+"일 후 열려요":isdone?"완료":"5분 · 읽고 바로 적용"}</div></div>
+      </div>`;
+    }
+    rows+=`</div>`;
+  }
+  $("#view").innerHTML=`
+    <div class="card" style="background:var(--green);color:#fff;border:none">
+      <h3 style="color:#fff">4주 거리두기 코스</h3>
+      <p style="font-size:13px;opacity:.9">하루 한 강, 5분의 배움과 하나의 미션.</p>
+      <div class="progressbar" style="background:rgba(255,255,255,.25)"><i style="width:${Math.round(done/28*100)}%;background:#fff"></i></div>
+      <div style="font-size:12.5px;opacity:.9">${done} / 28강 완료 · 오늘은 ${unlockedDay()}일차</div>
+    </div>
+    ${rows}`;
+}
+function openLesson(n){
+  const l=LESSONS[n-1];
+  const isdone=S.lessons.completed.includes(n);
+  const memo=S.lessons.missionMemos[n]||"";
+  const week=Math.ceil(n/7);
+  const extras = n===23?valueField("compass","가치 나침반","내가 향하고 싶은 방향을 한두 문장으로.")
+              : n===25?valueField("weeklyPlan","이번 주 작은 계획","가치와 연결된, 실패가 어려울 만큼 작은 행동 하나.")
+              : n===26?valueField("hardDayCard","힘든 날 카드","① 나의 조기 신호 ② 그때 할 것 ③ 나에게 건넬 한 문장")
+              : "";
+  openModal(`
+    ${mhead(`${n}강 · ${week}주차`)}
+    <h2 style="font-family:var(--display);font-size:21px;margin:4px 0 16px">${esc(l.t)}</h2>
+    <div class="lesson-body">${l.b.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    <div class="keyline">${esc(l.k)}</div>
+    <div class="card" style="background:var(--amber-soft);border:none">
+      <b style="color:var(--amber)">오늘의 미션</b>
+      <p style="font-size:14px;margin-top:4px">${esc(l.m)}</p>
+    </div>
+    ${extras}
+    <label class="f">미션 메모 <small>해보고 느낀 점을 짧게 남겨도 좋아요. (선택)</small></label>
+    <textarea id="l-memo" style="min-height:64px">${esc(memo)}</textarea>
+    <button class="btn ${isdone?'btn-soft':'btn-primary'} btn-block" style="margin-top:16px" onclick="completeLesson(${n})">
+      ${isdone?"메모 저장하기":"✓ 오늘의 배움 완료"}
+    </button>`);
+}
+function valueField(key,title,ph){
+  return `<label class="f">${title} <small>${ph}</small></label>
+  <textarea id="vf-${key}">${esc(S.values[key]||"")}</textarea>`;
+}
+function completeLesson(n){
+  ["compass","weeklyPlan","hardDayCard"].forEach(k=>{ const el=document.getElementById("vf-"+k); if(el) S.values[k]=el.value.trim(); });
+  S.lessons.missionMemos[n]=$("#l-memo").value.trim();
+  if(!S.lessons.completed.includes(n)) S.lessons.completed.push(n);
+  markActivity(); save(); closeModal();
+  toast(S.lessons.completed.length>=28?"🎓 4주 과정을 모두 마쳤어요. 축하해요!":`${n}강 완료 · 잘하고 있어요`);
+  if(currentTab==="learn")renderLearn(); else renderHome();
+}
+
+/* =====================================================
+   훈련
+===================================================== */
+function renderTrain(){
+  const totalMin=S.trainings.reduce((a,b)=>a+b.minutes,0);
+  $("#view").innerHTML=`
+    <div class="eyebrow">호흡 훈련</div>
+    <div class="card task" onclick="openBreath('box')"><div class="tic">🟩</div><div class="tbody"><b>${BREATHS.box.name}</b><span>${BREATHS.box.desc}</span></div><div class="go">›</div></div>
+    <div class="card task" onclick="openBreath('b478')"><div class="tic">🌙</div><div class="tbody"><b>${BREATHS.b478.name}</b><span>${BREATHS.b478.desc}</span></div><div class="go">›</div></div>
+    <div class="eyebrow">마음챙김 훈련</div>
+    <div class="card task" onclick="openScript('leaf')"><div class="tic">🍃</div><div class="tbody"><b>${SCRIPTS.leaf.name}</b><span>${SCRIPTS.leaf.desc}</span></div><div class="go">›</div></div>
+    <div class="card task" onclick="openScript('body')"><div class="tic">🧘</div><div class="tbody"><b>${SCRIPTS.body.name}</b><span>${SCRIPTS.body.desc}</span></div><div class="go">›</div></div>
+    <div class="card" style="text-align:center"><span class="muted">지금까지 함께한 훈련</span><div class="score-big" style="font-size:30px">${totalMin}분</div></div>`;
+}
+function openBreath(key){
+  const B=BREATHS[key];
+  openModal(`
+    ${mhead(B.name)}
+    <p class="muted">${B.desc}. 시간을 고르고 시작해주세요.</p>
+    <div class="chipwrap" id="bt-min">
+      <span class="chip on" data-v="1">1분</span><span class="chip" data-v="3">3분</span><span class="chip" data-v="5">5분</span>
+    </div>
+    <div class="breath-stage">
+      <div class="breath-circle" id="bc"><span id="bc-label">준비</span></div>
+      <div class="breath-meta">
+        <div class="phase-count" id="bc-count">·</div>
+        <div class="muted" id="bc-remain"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="bt-start">시작하기</button>`);
+  document.querySelectorAll("#bt-min .chip").forEach(c=>c.onclick=()=>{document.querySelectorAll("#bt-min .chip").forEach(x=>x.classList.remove("on"));c.classList.add("on");});
+  $("#bt-start").onclick=()=>startBreath(key, +document.querySelector("#bt-min .chip.on").dataset.v);
+}
+function startBreath(key,min){
+  const B=BREATHS[key];
+  let total=min*60, pi=0, ps=B.phases[0][1];
+  const circle=$("#bc"), label=$("#bc-label"), count=$("#bc-count"), remain=$("#bc-remain");
+  const btn=$("#bt-start"); btn.textContent="마치기"; btn.classList.remove("btn-primary"); btn.classList.add("btn-ghost");
+  btn.onclick=()=>finishBreath(key,min,min*60-total);
+  const applyPhase=()=>{
+    const [name,sec,scale]=B.phases[pi];
+    label.textContent=name; ps=sec;
+    circle.style.transitionDuration=sec+"s";
+    circle.style.transform=`scale(${scale})`;
+  };
+  applyPhase();
+  breathTimer=setInterval(()=>{
+    total--; ps--;
+    count.textContent=ps>0?ps:B.phases[pi][1];
+    remain.textContent=`남은 시간 ${Math.floor(total/60)}:${String(total%60).padStart(2,"0")}`;
+    if(ps<=0){ pi=(pi+1)%B.phases.length; applyPhase(); }
+    if(total<=0){ finishBreath(key,min,min*60); }
+  },1000);
+}
+function finishBreath(key,min,elapsedSec){
+  stopPlayers();
+  const m=Math.max(1,Math.round(elapsedSec/60));
+  S.trainings.push({date:new Date().toISOString(),type:key,minutes:m});
+  markActivity(); save(); closeModal(); toast(`호흡 훈련 ${m}분 완료 · 잘했어요 🌿`); if(currentTab==="train")renderTrain();
+}
+function openScript(key){
+  const SC=SCRIPTS[key];
+  let idx=0;
+  openModal(`
+    ${mhead(SC.name)}
+    <div class="dots" id="sc-dots">${SC.paras.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join("")}</div>
+    <div class="script-p" id="sc-p">${esc(SC.paras[0])}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-soft" style="flex:1" id="sc-toggle">일시정지</button>
+      <button class="btn btn-ghost" style="flex:1" id="sc-next">다음 →</button>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:10px" id="sc-done" hidden>훈련 마치기</button>`);
+  const show=i=>{
+    idx=i;
+    $("#sc-p").style.animation="none"; void $("#sc-p").offsetWidth; $("#sc-p").style.animation="";
+    $("#sc-p").textContent=SC.paras[i];
+    document.querySelectorAll("#sc-dots i").forEach((d,j)=>d.classList.toggle("on",j<=i));
+    if(i>=SC.paras.length-1){ clearInterval(scriptTimer); scriptTimer=null; $("#sc-done").hidden=false; $("#sc-toggle").disabled=true; $("#sc-next").disabled=true; }
+  };
+  const startT=()=>{ scriptTimer=setInterval(()=>{ if(idx<SC.paras.length-1) show(idx+1); },SC.secs*1000); };
+  startT();
+  $("#sc-toggle").onclick=function(){
+    if(scriptTimer){ clearInterval(scriptTimer); scriptTimer=null; this.textContent="재개하기"; }
+    else { startT(); this.textContent="일시정지"; }
+  };
+  $("#sc-next").onclick=()=>{ if(idx<SC.paras.length-1) show(idx+1); };
+  $("#sc-done").onclick=()=>{
+    S.trainings.push({date:new Date().toISOString(),type:key,minutes:Math.round(SC.paras.length*SC.secs/60)});
+    markActivity(); save(); closeModal(); toast("마음챙김 훈련 완료 🍃"); if(currentTab==="train")renderTrain();
+  };
+}
+
+/* =====================================================
+   마음 체크
+===================================================== */
+function openAssessPick(){
+  openModal(`
+    ${mhead("마음 체크")}
+    <p class="muted">지난 2주의 마음 상태를 스스로 점검하는 공개 선별 도구예요. 결과는 참고용이며, 진단이 아닙니다.</p>
+    <div class="card task" onclick="openAssess('PHQ9')"><div class="tic">🌧️</div><div class="tbody"><b>PHQ-9</b><span>우울 · 9문항 · 약 2분</span></div><div class="go">›</div></div>
+    <div class="card task" onclick="openAssess('GAD7')"><div class="tic">🌪️</div><div class="tbody"><b>GAD-7</b><span>불안 · 7문항 · 약 2분</span></div><div class="go">›</div></div>`);
+}
+function openAssess(type){
+  const T=type==="PHQ9"?PHQ9:GAD7;
+  openModal(`
+    ${mhead(T.name)}
+    <p class="muted">${T.intro}</p>
+    <div id="q-list">${T.items.map((q,i)=>`
+      <div class="qitem" data-i="${i}">
+        <div class="qt">${i+1}. ${esc(q)}</div>
+        <div class="opts">${OPT_LABELS.map((o,v)=>`<div class="opt" data-v="${v}">${o}</div>`).join("")}</div>
+      </div>`).join("")}
+    </div>
+    <button class="btn btn-primary btn-block" onclick="submitAssess('${type}')">결과 보기</button>`);
+  document.querySelectorAll(".qitem").forEach(item=>{
+    item.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
+      item.querySelectorAll(".opt").forEach(x=>x.classList.remove("on")); o.classList.add("on");
+    });
+  });
+}
+function submitAssess(type){
+  const T=type==="PHQ9"?PHQ9:GAD7;
+  const answers=[];
+  let missing=false;
+  document.querySelectorAll(".qitem").forEach(item=>{
+    const on=item.querySelector(".opt.on");
+    if(!on){missing=true;} else answers.push(+on.dataset.v);
+  });
+  if(missing){ toast("모든 문항에 답해주세요"); return; }
+  const total=answers.reduce((a,b)=>a+b,0);
+  const rec={id:"a_"+Date.now(),date:todayStr(),type,answers,total};
+  S.assessments.push(rec); S.settings.lastCheckDate=todayStr(); markActivity(); save();
+  showAssessResult(rec);
+}
+function bandOf(rec){
+  const T=rec.type==="PHQ9"?PHQ9:GAD7;
+  return T.bands.find(b=>rec.total>=b[0]&&rec.total<=b[1])[2];
+}
+function showAssessResult(rec){
+  const T=rec.type==="PHQ9"?PHQ9:GAD7;
+  const crisis = rec.type==="PHQ9" && rec.answers[8]>=1;
+  const high = rec.total>=15;
+  openModal(`
+    ${mhead(T.name+" 결과")}
+    ${crisis?`<div class="crisis">
+      <b>지금, 혼자 견디지 않아도 됩니다</b>
+      <p style="font-size:13.5px;margin-top:4px">스스로를 해치고 싶은 생각이 조금이라도 있었다면, 이 앱보다 사람의 도움이 먼저예요. 전화 한 통이면 24시간 언제든 이야기를 들어줄 전문가가 있습니다.</p>
+      <div class="tel">자살예방 상담전화 109</div>
+      <div style="font-size:13.5px">정신건강 상담전화 1577-0199 (24시간)</div>
+    </div>`:""}
+    <div class="card" style="text-align:center">
+      <div class="muted">${todayStr()}</div>
+      <div class="score-big">${rec.total}<span style="font-size:16px;color:var(--ink-soft)"> / ${T.max}</span></div>
+      <div class="pill" style="font-size:13px">${bandOf(rec)}</div>
+    </div>
+    ${high&&!crisis?`<div class="card" style="background:var(--amber-soft);border:none"><b style="color:var(--amber)">전문가와 상의해보세요</b><p style="font-size:13.5px;margin-top:4px">점수가 다소 높게 나왔어요. 셀프케어와 함께, 정신건강의학과나 심리상담 기관의 도움을 받는 것을 권해드려요.</p></div>`:""}
+    <p class="muted" style="margin:6px 2px 14px">이 검사는 선별 도구일 뿐, 진단이 아닙니다. 결과가 걱정된다면 전문가와 상담해보세요.</p>
+    <button class="btn btn-soft btn-block" onclick="copyAssessPrompt()">🤖 결과를 클로드 코치와 이야기하기</button>
+    <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="closeModal();showTab('stats')">추이 그래프 보기</button>`);
+}
+
+/* =====================================================
+   나의 변화 (통계)
+===================================================== */
+function renderStats(){
+  const withS2=S.entries.filter(e=>e.step2);
+  const deltas=withS2.map(e=>e.intensity-e.step2.intensityAfter);
+  const avgD=deltas.length?Math.round(deltas.reduce((a,b)=>a+b,0)/deltas.length):null;
+  const emoCount={}, trapCount={};
+  S.entries.forEach(e=>(e.emotions||[]).forEach(x=>emoCount[x]=(emoCount[x]||0)+1));
+  withS2.forEach(e=>(e.step2.traps||[]).forEach(t=>trapCount[t]=(trapCount[t]||0)+1));
+  const topEmo=Object.entries(emoCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const topTrap=Object.entries(trapCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const trainMin=S.trainings.reduce((a,b)=>a+b.minutes,0);
+  const notes=S.entries.filter(e=>e.coachNote).slice(-5).reverse();
+
+  $("#view").innerHTML=`
+    <div class="eyebrow">거리두기의 효과</div>
+    <div class="card" style="text-align:center">
+      ${avgD!==null?`
+        <div class="muted">거리두기 후, 감정 강도가 평균</div>
+        <div class="score-big">${avgD>0?"−":"+"}${Math.abs(avgD)}<span style="font-size:16px;color:var(--ink-soft)">점</span></div>
+        <div class="muted">${withS2.length}번의 거리두기 기록 기준</div>`
+      :`<div class="muted" style="padding:8px 0">STEP 2까지 완료한 기록이 쌓이면<br>거리두기의 효과가 숫자로 보여요.</div>`}
+    </div>
+    <div class="statgrid">
+      <div class="statbox"><div class="n">${S.entries.length}</div><div class="l">생각기록</div></div>
+      <div class="statbox"><div class="n">${S.lessons.completed.length}/28</div><div class="l">배움 진행</div></div>
+      <div class="statbox"><div class="n">${trainMin}분</div><div class="l">훈련 누적</div></div>
+      <div class="statbox"><div class="n">${S.assessments.length}회</div><div class="l">마음 체크</div></div>
+    </div>
+    <div class="eyebrow">마음의 추이</div>
+    <div class="card">
+      <canvas id="chart" width="640" height="330"></canvas>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:12px">
+        <span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green)"></i> PHQ-9 우울</span>
+        <span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--amber)"></i> GAD-7 불안</span>
+      </div>
+      <button class="btn btn-soft btn-block btn-sm" style="margin-top:12px" onclick="openAssessPick()">＋ 마음 체크 하기</button>
+    </div>
+    <div class="eyebrow">나의 패턴</div>
+    <div class="card">
+      <b style="font-size:14px">자주 만난 감정 TOP 3</b>
+      <div style="margin:6px 0 12px">${topEmo.length?topEmo.map(x=>`<span class="pill">${esc(x[0])} · ${x[1]}회</span>`).join(""):"<span class='muted'>아직 데이터가 없어요</span>"}</div>
+      <b style="font-size:14px">자주 걸린 생각의 함정 TOP 3</b>
+      <div style="margin-top:6px">${topTrap.length?topTrap.map(x=>`<span class="pill amber">${esc(x[0])} · ${x[1]}회</span>`).join(""):"<span class='muted'>아직 데이터가 없어요</span>"}</div>
+    </div>
+    <div class="eyebrow">클로드 코치와 회고</div>
+    <div class="card">
+      <p class="desc" style="margin-bottom:12px">일주일에 한 번, 기록을 모아 코치와 돌아보세요. 버튼을 누르면 주간 요약이 프롬프트로 복사돼요.</p>
+      <button class="btn btn-primary btn-block" onclick="copyWeeklyPrompt()">🤖 주간 회고 프롬프트 복사</button>
+    </div>
+    ${notes.length?`<div class="eyebrow">간직한 코치 노트</div>${notes.map(e=>`
+      <div class="card" onclick="openDetail('${e.id}')" style="cursor:pointer">
+        <div class="muted" style="margin-bottom:4px">${fmtDT(e.createdAt)}</div>
+        <div style="font-size:14px;white-space:pre-wrap">${esc(e.coachNote)}</div>
+      </div>`).join("")}`:""}
+    ${(S.values.compass||S.values.weeklyPlan||S.values.hardDayCard)?`
+      <div class="eyebrow">나의 나침반</div>
+      <div class="card">
+        ${S.values.compass?`<b style="font-size:13px;color:var(--green)">가치 나침반</b><p style="font-size:14px;margin:2px 0 12px;white-space:pre-wrap">${esc(S.values.compass)}</p>`:""}
+        ${S.values.weeklyPlan?`<b style="font-size:13px;color:var(--green)">이번 주 작은 계획</b><p style="font-size:14px;margin:2px 0 12px;white-space:pre-wrap">${esc(S.values.weeklyPlan)}</p>`:""}
+        ${S.values.hardDayCard?`<b style="font-size:13px;color:var(--amber)">힘든 날 카드</b><p style="font-size:14px;margin:2px 0 0;white-space:pre-wrap">${esc(S.values.hardDayCard)}</p>`:""}
+      </div>`:""}
+    <div class="eyebrow">데이터 관리</div>
+    <div class="card">
+      <p class="desc" style="margin-bottom:12px">${fbUser?"기록은 이 기기와 내 클라우드에 함께 저장돼요. 다른 기기에서 로그인하면 이어서 쓸 수 있어요.":"모든 기록은 이 기기의 브라우저에만 저장돼요. 기기를 바꾸기 전에 꼭 백업해주세요."}</p>
+      ${CLOUD_ON?`<b style="font-size:14px">☁️ 클라우드 동기화</b>
+      <p class="desc" style="margin:4px 0 10px">${fbUser?`<b>${esc(fbUser.email||"내 계정")}</b>으로 동기화 중입니다. 기록이 내 Google 계정에 연결된 Firebase 서버에 저장돼요.`:"Google 계정으로 로그인하면 기록이 서버에 자동 저장되고, 다른 기기에서도 이어집니다."}</p>
+      <button class="btn btn-soft btn-sm" style="margin-bottom:12px" onclick="${fbUser?'cloudLogout()':'cloudLogin()'}">${fbUser?"동기화 끄기 (로그아웃)":"Google로 로그인해 동기화 켜기"}</button>`:""}
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-soft btn-sm" onclick="exportData()">JSON 내보내기</button>
+        <button class="btn btn-soft btn-sm" onclick="$('#imp').click()">가져오기</button>
+        <button class="btn btn-danger btn-sm" onclick="wipeData()">전체 삭제</button>
+      </div>
+      <input type="file" id="imp" accept=".json" hidden onchange="importData(this)">
+      <div class="divider"></div>
+      <p class="muted">이 앱은 교육·자기관리 목적의 도구이며, 의료기기나 심리치료가 아닙니다.<br>도움이 필요할 땐 · 자살예방 상담전화 <b>109</b> · 정신건강 상담전화 <b>1577-0199</b> (24시간)</p>
+    </div>`;
+  drawChart();
+}
+function drawChart(){
+  const cv=$("#chart"); if(!cv) return;
+  const ctx=cv.getContext&&cv.getContext("2d"); if(!ctx) return;
+  const W=cv.width, H=cv.height, padL=44, padB=40, padT=18, padR=14;
+  ctx.clearRect(0,0,W,H);
+  ctx.font="20px Pretendard, sans-serif";
+  const data=S.assessments;
+  if(!data.length){
+    ctx.fillStyle="#5C6B62"; ctx.textAlign="center";
+    ctx.fillText("마음 체크를 하면 추이가 여기에 그려져요", W/2, H/2);
+    return;
+  }
+  const dates=[...new Set(data.map(a=>a.date))].sort();
+  const x=i=>padL+(dates.length===1?((W-padL-padR)/2):(i*(W-padL-padR)/(dates.length-1)));
+  const y=v=>H-padB-(v/27)*(H-padB-padT);
+  // grid
+  ctx.strokeStyle="#DCE3D8"; ctx.fillStyle="#5C6B62"; ctx.textAlign="right"; ctx.lineWidth=1;
+  [0,9,18,27].forEach(v=>{ ctx.beginPath(); ctx.moveTo(padL,y(v)); ctx.lineTo(W-padR,y(v)); ctx.stroke(); ctx.fillText(v, padL-8, y(v)+7); });
+  ctx.textAlign="center";
+  dates.forEach((d,i)=>{ if(dates.length<=6 || i%Math.ceil(dates.length/6)===0) ctx.fillText(d.slice(5).replace("-","/"), x(i), H-12); });
+  const series=[["PHQ9","#3E5C50"],["GAD7","#B4552D"]];
+  series.forEach(([type,color])=>{
+    const pts=dates.map((d,i)=>{
+      const recs=data.filter(a=>a.type===type&&a.date===d);
+      return recs.length?{i,v:recs[recs.length-1].total}:null;
+    }).filter(Boolean);
+    if(!pts.length) return;
+    ctx.strokeStyle=color; ctx.lineWidth=3; ctx.beginPath();
+    pts.forEach((p,j)=>{ j?ctx.lineTo(x(p.i),y(p.v)):ctx.moveTo(x(p.i),y(p.v)); }); ctx.stroke();
+    ctx.fillStyle=color;
+    pts.forEach(p=>{ ctx.beginPath(); ctx.arc(x(p.i),y(p.v),5,0,7); ctx.fill(); });
+  });
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`mindwork_backup_${todayStr().replaceAll("-","")}.json`; a.click();
+  URL.revokeObjectURL(a.href); toast("백업 파일을 내려받았어요");
+}
+function importData(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d.entries || !d.settings) throw 0;
+      if(!confirm("현재 데이터를 백업 파일의 내용으로 교체할까요?")) return;
+      S=d; save(); renderStats(); renderStreak(); toast("데이터를 불러왔어요");
+    }catch(e){ toast("올바른 백업 파일이 아니에요"); }
+  };
+  r.readAsText(f); input.value="";
+}
+function wipeData(){
+  if(!confirm("정말 모든 기록을 삭제할까요?")) return;
+  if(!confirm("삭제하면 되돌릴 수 없어요. 백업은 해두셨나요?\n확인을 누르면 모두 지워집니다.")) return;
+  if(docRef){ docRef.delete().catch(()=>{}); }
+  localStorage.removeItem(KEY); load(); save();
+  toast("모든 데이터를 삭제했어요"); location.reload();
+}
+
+/* =====================================================
+   온보딩 & 시작
+===================================================== */
+function boot(){
+  load();
+  cloudSetup();
+  if(!S.settings.onboardingDone){
+    $("#onboard").classList.add("open");
+    $("#ob-start").onclick=()=>{
+      if(!$("#ob-agree").checked){ toast("안내 확인에 동의해주셔야 시작할 수 있어요"); return; }
+      S.settings.userName=$("#ob-name").value.trim();
+      S.settings.startDate=todayStr();
+      S.settings.onboardingDone=true;
+      save(); $("#onboard").classList.remove("open");
+      renderStreak(); showTab("home");
+      toast("환영해요. 오늘이 1일차예요 🌱");
+    };
+  } else {
+    renderStreak(); showTab("home");
+  }
+}
+boot();
+</script>
+</body>
+</html>
