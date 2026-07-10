@@ -482,19 +482,64 @@ function cloudSetup(){
     });
   }catch(e){ console.warn("firebase init:",e); }
 }
+/* ---------- 병합 동기화 (last-write-wins 전체 덮어쓰기로 인한 데이터 유실 방지) ----------
+   entries에는 항목별 updatedAt이 없으므로, 상태 전체의 updatedAt으로 신/구 쪽을 정하고
+   older→newer 순서로 Map에 넣어 id(또는 대체 키) 충돌 시 newer가 덮도록 한다. */
+function mergeStates(remote, local){
+  const base=DEFAULT();
+  const r=Object.assign({}, base, remote||{});
+  const l=Object.assign({}, base, local||{});
+  const localNewer=(l.updatedAt||0)>=(r.updatedAt||0);
+  const older=localNewer?r:l, newer=localNewer?l:r;
+
+  const unionByKey=(oldArr,newArr,keyFn)=>{
+    const map=new Map();
+    (oldArr||[]).forEach(x=>map.set(keyFn(x),x));
+    (newArr||[]).forEach(x=>map.set(keyFn(x),x));
+    return [...map.values()];
+  };
+  const pickNonEmpty=(oldV,newV)=> (newV && String(newV).trim()) ? newV : (oldV||"");
+  const minDate=(a,b)=>{ if(!a) return b; if(!b) return a; return a<b?a:b; };
+  const maxDate=(a,b)=>{ if(!a) return b||null; if(!b) return a; return a>b?a:b; };
+
+  const entries=unionByKey(older.entries,newer.entries,e=>e.id)
+    .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  const assessments=unionByKey(older.assessments,newer.assessments,a=>a.id)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const trainings=unionByKey(older.trainings,newer.trainings,t=>t.date+"|"+t.type)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const completed=[...new Set([...(older.lessons?.completed||[]),...(newer.lessons?.completed||[])])].sort((a,b)=>a-b);
+  const missionMemos=Object.assign({},older.lessons?.missionMemos||{},newer.lessons?.missionMemos||{});
+  const activityDates=[...new Set([...(older.activityDates||[]),...(newer.activityDates||[])])].sort();
+  const values={
+    compass:pickNonEmpty(older.values?.compass,newer.values?.compass),
+    weeklyPlan:pickNonEmpty(older.values?.weeklyPlan,newer.values?.weeklyPlan),
+    hardDayCard:pickNonEmpty(older.values?.hardDayCard,newer.values?.hardDayCard)
+  };
+  const settings={
+    userName:pickNonEmpty(older.settings?.userName,newer.settings?.userName),
+    startDate:minDate(older.settings?.startDate,newer.settings?.startDate)||base.settings.startDate,
+    onboardingDone:!!(older.settings?.onboardingDone||newer.settings?.onboardingDone),
+    lastCheckDate:maxDate(older.settings?.lastCheckDate,newer.settings?.lastCheckDate)
+  };
+
+  return { version:base.version, updatedAt:Date.now(), settings, entries,
+    lessons:{completed,missionMemos}, assessments, trainings, activityDates, values };
+}
 async function cloudPull(){
   try{
     const snap=await docRef.get();
-    if(snap.exists && (snap.data().updatedAt||0)>(S.updatedAt||0)){
-      S=snap.data();
+    if(snap.exists){
+      S=mergeStates(snap.data(), S);
       localStorage.setItem(KEY, JSON.stringify(S));
       if(S.settings.onboardingDone){
         document.getElementById("onboard").classList.remove("open");
         renderStreak(); showTab(currentTab);
       }
-      toast("☁️ 클라우드의 최신 기록을 불러왔어요");
+      await docRef.set(S); // 병합 결과를 서버에도 반영
+      toast("☁️ 클라우드와 기록을 병합해 동기화했어요");
     } else {
-      await docRef.set(S); // 서버가 비었거나 로컬이 최신 → 업로드
+      await docRef.set(S); // 서버 문서 없음 → 최초 업로드
     }
   }catch(e){ console.warn("cloud pull:",e); toast("동기화 연결에 문제가 있어요. 기록은 이 기기에 안전하게 저장돼요."); }
 }
