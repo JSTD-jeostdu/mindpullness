@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>마음 거리두기 워크북</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북. 생각기록, 배움 코스, 호흡 훈련, 마음 체크를 한 곳에서 관리해요.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jstd-jeostdu.github.io/mindpullness/">
+<meta property="og:title" content="마음 거리두기 워크북 · mindpullness">
+<meta property="og:description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북. 생각기록, 배움 코스, 호흡 훈련, 마음 체크를 한 곳에서 관리해요.">
+<meta property="og:image" content="https://jstd-jeostdu.github.io/mindpullness/assets/og-image.png">
+<meta property="og:image:width" content="1729">
+<meta property="og:image:height" content="910">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="마음 거리두기 워크북 · mindpullness">
+<meta name="twitter:description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북.">
+<meta name="twitter:image" content="https://jstd-jeostdu.github.io/mindpullness/assets/og-image.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -212,11 +225,9 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
 /* ---------- 안내 도우미 챗봇 ---------- */
 .chatbot-fab{
   position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:60;
-  width:56px;height:56px;border-radius:50%;background:var(--green);border:none;cursor:pointer;
-  box-shadow:0 6px 18px rgba(39,53,46,.28);padding:0;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
+  width:74px;height:107px;background:none;border:none;cursor:pointer;padding:0;
 }
-.chatbot-fab img{width:100%;height:100%;object-fit:cover;transform:scale(1.28) translateY(6%)}
+.chatbot-fab img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(39,53,46,.35))}
 .chatbot-fab:active{transform:scale(.94)}
 .chat-thread{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
 .chat-turn{display:flex;flex-direction:column;gap:8px}
@@ -225,7 +236,7 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
   padding:9px 14px;font-size:13.5px;max-width:80%;
 }
 .chat-bot-msg{display:flex;gap:9px;align-items:flex-start}
-.chat-bot-msg img{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--green-soft);object-fit:cover}
+.chat-bot-msg img{width:56px;height:81px;flex-shrink:0;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(39,53,46,.2))}
 .chat-bot-msg .bubble{
   background:var(--green-soft);color:var(--ink);border-radius:3px 14px 14px 14px;
   padding:10px 14px;font-size:13.5px;line-height:1.6;max-width:82%;
