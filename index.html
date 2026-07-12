@@ -209,6 +209,34 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
 #onboard .notice li{margin:6px 0 6px 18px}
 .agree{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin:16px 0 22px;cursor:pointer}
 .agree input{margin-top:4px;accent-color:var(--green);width:17px;height:17px}
+/* ---------- 안내 도우미 챗봇 ---------- */
+.chatbot-fab{
+  position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:60;
+  width:56px;height:56px;border-radius:50%;background:var(--green);border:none;cursor:pointer;
+  box-shadow:0 6px 18px rgba(39,53,46,.28);padding:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.chatbot-fab img{width:100%;height:100%;object-fit:cover;transform:scale(1.28) translateY(6%)}
+.chatbot-fab:active{transform:scale(.94)}
+.chat-thread{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.chat-turn{display:flex;flex-direction:column;gap:8px}
+.chat-user-msg{
+  align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 3px 14px;
+  padding:9px 14px;font-size:13.5px;max-width:80%;
+}
+.chat-bot-msg{display:flex;gap:9px;align-items:flex-start}
+.chat-bot-msg img{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--green-soft);object-fit:cover}
+.chat-bot-msg .bubble{
+  background:var(--green-soft);color:var(--ink);border-radius:3px 14px 14px 14px;
+  padding:10px 14px;font-size:13.5px;line-height:1.6;max-width:82%;
+}
+.chat-options{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.chat-opt-btn{
+  text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;
+  padding:10px 14px;font-size:13.5px;color:var(--green);font-weight:600;cursor:pointer;
+  font-family:var(--body);
+}
+.chat-opt-btn:active{transform:scale(.98)}
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -228,6 +256,7 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
     <button data-tab="train"><span class="ic">🌬️</span>훈련</button>
     <button data-tab="stats"><span class="ic">📊</span>나의 변화</button>
   </nav>
+  <button class="chatbot-fab" id="chatbot-fab" aria-label="안내 도우미 열기" onclick="openChatbot()"><img src="chatbot/1_idle.png" alt="안내 도우미"></button>
 </div>
 <div id="modal-root"><div class="modal-bg"></div><div class="modal" id="modal-body"></div></div>
 <div id="toast"></div>
@@ -435,6 +464,119 @@ const SCRIPTS = {
     "천천히 손가락과 발가락을 움직여봅니다. 준비가 되면 눈을 뜹니다."
   ]}
 };
+
+/* =====================================================
+   안내 도우미 챗봇 (스크립트 FAQ · API 호출 없음)
+===================================================== */
+const CHATBOT_FAQ = {
+  root:{ pose:"1_idle", text:"안녕하세요! 저는 mindpullness 안내 도우미예요. 궁금한 걸 골라주세요.", options:[
+    {label:"생각기록은 어떻게 써요?", to:"record_1"},
+    {label:"클로드 코치가 뭐예요?", to:"coach_1"},
+    {label:"28강 배움 코스는요?", to:"learn_1"},
+    {label:"호흡·마음챙김 훈련은요?", to:"train_1"},
+    {label:"마음체크(PHQ-9/GAD-7)는요?", to:"assess_1"},
+    {label:"기기 간 동기화는요?", to:"sync_1"},
+    {label:"이 앱은 뭐 하는 앱이에요?", to:"about_1"}
+  ]},
+
+  record_1:{ pose:"2_clipboard", text:"기록 탭 → + 버튼을 누르면 STEP1이 열려요. 상황·자동적 사고·감정·신체반응·행동을 순서대로 적어요. 상황 칸에는 카메라로 찍히는 사실만 적는 게 포인트예요.", options:[
+    {label:"STEP2는 꼭 바로 해야 해요?", to:"record_2"},
+    {label:"감정 강도는 어떻게 재요?", to:"record_3"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  record_2:{ pose:"2_clipboard", text:"아니요. STEP1만 저장하고 나가도 '미완성'으로 남아있어서, 홈 화면에서 이어쓰기로 다시 들어올 수 있어요. 마음이 준비됐을 때 천천히 STEP2(거리두기 질문)를 이어가시면 돼요.", options:[
+    {label:"거리두기 질문엔 뭐가 있어요?", to:"record_4"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  record_3:{ pose:"2_clipboard", text:"STEP1에서 슬라이더로 0~100 강도를 기록하고, STEP2에서 재평가 후 다시 한 번 재요. 두 숫자의 차이(Δ)가 기록 카드와 통계에 자동으로 표시돼요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  record_4:{ pose:"2_clipboard", text:"세 가지예요. ① 이건 '사실'인가 '생각'인가? ② 친한 친구가 같은 생각을 말한다면 뭐라고 해줄까? ③ \"나는 ~라는 생각을 하고 있구나\"를 붙여 다시 써보기. 이후 재평가된 생각과 생각의 함정도 함께 기록할 수 있어요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  coach_1:{ pose:"4_xray", text:"기록 상세 화면 아래 [🤖 클로드 코치에게 가져가기] 버튼을 누르면, 그 기록과 최근 맥락 요약이 프롬프트 하나로 합쳐져서 클립보드에 복사돼요. 이걸 클로드에 붙여넣으면 코치처럼 질문을 던지며 도와줘요.", options:[
+    {label:"코치 노트는 뭐예요?", to:"coach_2"},
+    {label:"주간 회고 프롬프트도 있어요?", to:"coach_3"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  coach_2:{ pose:"4_xray", text:"클로드가 준 답변 중에 남기고 싶은 문장을 기록 상세의 '코치 노트' 칸에 붙여넣어 저장할 수 있어요. 저장된 노트는 [나의 변화] 탭에서 모아볼 수 있어요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  coach_3:{ pose:"4_xray", text:"[나의 변화] 탭에 '주간 회고 프롬프트 복사' 버튼이 있어요. 최근 한 주의 기록을 요약해 클로드에게 패턴·잘한 점·다음 주 작은 실험을 물어볼 수 있는 프롬프트예요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  learn_1:{ pose:"6_thumbsup", text:"4주 28강 구성이고, 시작일 기준으로 하루에 1강씩 순차적으로 열려요. [배움] 탭에서 오늘 열린 강의를 바로 확인할 수 있어요.", options:[
+    {label:"밀린 강의 몰아봐도 돼요?", to:"learn_2"},
+    {label:"미션은 뭐예요?", to:"learn_3"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  learn_2:{ pose:"6_thumbsup", text:"네, 밀린 강의는 몰아서 들을 수 있어요. 다만 하루 최대 3강 정도로 나눠 보시는 걸 권해드려요. 급하게 몰아 읽는 것보다 기록으로 몸에 새기는 게 더 오래 남거든요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  learn_3:{ pose:"6_thumbsup", text:"각 강 끝에는 '오늘의 미션'이 체크박스로 달려 있어요. 완료 후 메모를 남길 수도 있어요. 미션 메모는 강의별로 따로 저장돼요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  train_1:{ pose:"5_syringe", text:"박스 호흡(4-4-4-4), 4·7·8 호흡, 생각 흘려보내기, 바디 스캔 네 가지가 있어요. [훈련] 탭에서 골라 바로 시작할 수 있어요.", options:[
+    {label:"시간은 얼마나 걸려요?", to:"train_2"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  train_2:{ pose:"5_syringe", text:"호흡 훈련은 1·3·5분 중에 고를 수 있고, 생각 흘려보내기와 바디 스캔은 각각 5분짜리 스크립트예요. 완료하면 훈련 로그가 남아서 [나의 변화]에서 누적 시간을 볼 수 있어요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  assess_1:{ pose:"3_stethoscope", text:"PHQ-9(우울 9문항)와 GAD-7(불안 7문항), 둘 다 공개된 자가 선별 도구예요. 진단 도구가 아니라 지금 상태를 스스로 살펴보는 참고용 체크예요.", options:[
+    {label:"얼마나 자주 해요?", to:"assess_2"},
+    {label:"위기 안내 카드가 뜨는 경우가 있던데요?", to:"assess_3"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  assess_2:{ pose:"3_stethoscope", text:"14일 간격을 권장하고, 그 주기가 지나면 홈 화면에서 리마인드가 떠요. 원하시면 그보다 자주 하셔도 괜찮아요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  assess_3:{ pose:"3_stethoscope", text:"급성 위기, 정신병적 증상, 자살·자해 관련 문제가 있다면 이 앱보다 정신건강 전문가의 도움이 우선입니다. (자살예방 상담전화 109, 정신건강 상담전화 1577-0199 · 24시간) 이 검사는 선별 도구일 뿐, 진단이 아닙니다.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  sync_1:{ pose:"2_clipboard", text:"기본적으로 모든 기록은 이 기기의 브라우저에만 저장돼요. [나의 변화] → 데이터 관리에서 Google 로그인을 하면, 본인 Google 계정에 연결된 개인 저장 공간에도 자동으로 미러링돼요.", options:[
+    {label:"다른 기기에서도 보여요?", to:"sync_2"},
+    {label:"백업은 어떻게 해요?", to:"sync_3"},
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  sync_2:{ pose:"2_clipboard", text:"네, 같은 Google 계정으로 로그인하면 다른 기기의 기록과 자동으로 병합돼요. 새 기기에서 로그인해도 기존 기록이 지워지지 않고 합쳐지도록 설계되어 있어요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+  sync_3:{ pose:"2_clipboard", text:"[나의 변화] → 데이터 관리에서 JSON 파일로 내보내기·가져오기가 가능해요. 기기를 바꾸기 전에는 백업을 해두시거나 동기화를 켜두시는 걸 권해드려요.", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]},
+
+  about_1:{ pose:"1_idle", text:"mindpullness는 CBT·ACT 같은 근거 기반 기법으로 구성한 1인용 셀프케어 워크북이에요. 기록은 이 앱이, 코칭은 클로드가 함께해요. 이 앱은 교육·자기관리 목적의 도구이며, 의료기기나 심리치료가 아닙니다. 도움이 필요할 땐 · 자살예방 상담전화 109 · 정신건강 상담전화 1577-0199 (24시간)", options:[
+    {label:"메인 메뉴로", to:"root"}
+  ]}
+};
+let chatThread=[];
+function openChatbot(){
+  chatThread=[{node:CHATBOT_FAQ.root}];
+  openModal(chatbotHtml());
+}
+function chatbotHtml(){
+  const turns=chatThread.map(t=>`
+    ${t.userLabel?`<div class="chat-user-msg">${esc(t.userLabel)}</div>`:""}
+    <div class="chat-bot-msg">
+      <img src="chatbot/${t.node.pose}.png" alt="안내 도우미">
+      <div class="bubble">${esc(t.node.text)}</div>
+    </div>`).join("");
+  const last=chatThread[chatThread.length-1].node;
+  const opts=last.options.map((o,i)=>`<button class="chat-opt-btn" onclick="advanceChat('${o.to}',${i})">${esc(o.label)}</button>`).join("");
+  return `${mhead("안내 도우미")}<div class="chat-thread">${turns}</div><div class="chat-options">${opts}</div>`;
+}
+function advanceChat(nodeId,optIndex){
+  const label=chatThread[chatThread.length-1].node.options[optIndex].label;
+  chatThread = nodeId==="root" ? [{node:CHATBOT_FAQ.root}] : [...chatThread,{node:CHATBOT_FAQ[nodeId],userLabel:label}];
+  $("#modal-body").innerHTML=chatbotHtml();
+  $("#modal-body").scrollTop=$("#modal-body").scrollHeight;
+}
 
 /* ---------- 코치 프롬프트 원칙 ---------- */
 const COACH_RULES = `당신은 인지치료 기반 셀프케어를 돕는 코치입니다. 아래 원칙을 지켜주세요.
