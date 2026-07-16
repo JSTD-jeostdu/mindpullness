@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>마음 거리두기 워크북</title>
+<title>마음당김 워크북</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북. 생각기록, 배움 코스, 호흡 훈련, 마음 체크를 한 곳에서 관리해요.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jstd-jeostdu.github.io/mindpullness/">
-<meta property="og:title" content="마음 거리두기 워크북 · mindpullness">
+<meta property="og:title" content="마음당김 워크북 · Mindpullness Workbook">
 <meta property="og:description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북. 생각기록, 배움 코스, 호흡 훈련, 마음 체크를 한 곳에서 관리해요.">
 <meta property="og:image" content="https://jstd-jeostdu.github.io/mindpullness/assets/og-image.png">
 <meta property="og:image:width" content="1729">
 <meta property="og:image:height" content="910">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="마음 거리두기 워크북 · mindpullness">
+<meta name="twitter:title" content="마음당김 워크북 · Mindpullness Workbook">
 <meta name="twitter:description" content="CBT·ACT 등 근거 기반 기법으로 구성한 1인용 셀프케어 워크북.">
 <meta name="twitter:image" content="https://jstd-jeostdu.github.io/mindpullness/assets/og-image.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -93,7 +93,16 @@ input[type=range]{width:100%;accent-color:var(--green);margin:10px 0 2px}
 .delta .dot.after{background:var(--green);opacity:.85}
 .delta .tail{width:22px;height:2px;background:linear-gradient(90deg,var(--amber),var(--green));border-radius:2px}
 .pill{display:inline-block;background:var(--green-soft);color:var(--green);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;margin:2px 3px 2px 0}
-.pill.amber{background:var(--amber-soft);color:var(--amber)}
+.pill.amber{background:var(--amber-soft);color:var(--amber);cursor:pointer}
+.trap-tip{
+  position:fixed;z-index:200;max-width:270px;background:rgba(39,53,46,.94);color:#fff;
+  border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.55;
+  box-shadow:0 10px 28px rgba(39,53,46,.35);
+  opacity:0;transform:translateY(4px);transition:opacity .15s ease,transform .15s ease;
+}
+.trap-tip.show{opacity:1;transform:translateY(0)}
+.trap-tip b{display:block;margin-bottom:5px;font-size:13px;color:#ffcf8a}
+.trap-tip .ex{margin-top:7px;color:rgba(255,255,255,.72);font-size:12px}
 .muted{color:var(--ink-soft);font-size:13px}
 .divider{height:1px;background:var(--line);margin:16px 0}
 .empty{
@@ -256,7 +265,7 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
 <body>
 <div id="app">
   <header>
-    <h1>마음 거리두기 워크북 <span id="syncbadge" style="font-size:13px"></span></h1>
+    <h1>마음당김 워크북 <span id="syncbadge" style="font-size:13px"></span></h1>
     <div class="streak" id="streak"></div>
   </header>
   <main id="view"></main>
@@ -274,8 +283,8 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:var
 
 <div id="onboard">
   <div class="inner">
-    <div class="eyebrow">MIND DISTANCING WORKBOOK</div>
-    <h1>생각과 나 사이,<br>한 걸음의 거리를 만듭니다.</h1>
+    <div class="eyebrow">MINDPULLNESS WORKBOOK</div>
+    <h1>생각과 나 사이,<br>한 걸음 마음을 당겨 놓습니다.</h1>
     <p style="color:var(--ink-soft)">인지행동치료(CBT)·수용전념치료(ACT) 등 공개된 근거 기반 기법으로 구성된 개인용 셀프케어 워크북입니다. 기록은 이 앱이, 코칭은 클로드가 함께합니다.</p>
     <div class="notice">
       <b style="color:var(--ink)">시작하기 전에 꼭 알아주세요</b>
@@ -323,6 +332,18 @@ const FIREBASE_CONFIG = {
 const EMOTIONS = ["불안","우울","분노","수치심","죄책감","무기력","외로움","초조","서운함","허무","질투","긴장"];
 const BODIES = ["가슴 답답함","심장 두근거림","어깨·목 긴장","두통","소화불량","손떨림","얼굴 화끈거림","피로감","호흡 얕아짐"];
 const TRAPS = ["흑백사고","파국화","독심술","예언자적 사고","과잉일반화","낙인찍기","당위진술","감정적 추론","정신적 여과","개인화"];
+const TRAP_DEFS = {
+  "흑백사고": { def:"모든 상황을 이분법적으로만 나누어 중간지대(회색지대)를 인정하지 않는 오류", example:"1등이 아니면 이번 시험은 완전히 실패한 거야." },
+  "파국화": { def:"작은 부정적 사건을 바탕으로 미래에 최악의 시나리오를 상상하며 공포를 키우는 오류", example:"상사가 보자고 하네? 나 해고당해서 길바닥에 나앉으면 어쩌지?" },
+  "독심술": { def:"객관적인 근거 없이 타인의 생각과 의도를 다 알고 있다고 단정 짓는 오류", example:"저 사람이 방금 하품한 건 내가 지루하고 한심해서일 거야." },
+  "예언자적 사고": { def:"미래에 대해 객관적 근거 없이 오직 비관적인 결과만을 확신하는 오류", example:"준비를 아무리 열심히 해도 난 이번 면접에서 무조건 떨어질 거야." },
+  "과잉일반화": { def:"단 한두 번의 개별적인 사건을 바탕으로 전체에 일반적인 결론을 내리는 오류", example:"소개팅에서 한 번 거절당했으니 난 평생 연애를 못 할 운명이야." },
+  "낙인찍기": { def:"자신이나 타인의 단 한 가지 행동을 보고 부정적인 꼬리표를 붙여 단정하는 오류", example:"실수를 한 번 하다니, 역시 나는 '패배자'이고 '무능한 인간'이야." },
+  "당위진술": { def:"자신과 타인에게 완벽하고 절대적인 규칙('~해야만 한다')을 강요하는 오류", example:"사람이라면 무슨 일이 있어도 절대로 화를 내서는 안 된다." },
+  "감정적 추론": { def:"객관적 사실이 아닌 자신이 느끼는 '감정'을 사실의 증거로 삼는 오류", example:"내가 지금 마음이 불안하고 찜찜한 걸 보니 무조건 나쁜 일이 생길 징조야." },
+  "정신적 여과": { def:"전체 상황 중에서 부정적인 단면 하나에만 집착하고 긍정적인 현실은 걸러내는 오류", example:"동료 9명이 칭찬했지만 1명이 아쉽다고 했으니 오늘 발표는 망했어." },
+  "개인화": { def:"자신과 무관하거나 통제할 수 없는 외부 사건을 모두 자신의 탓으로 돌리는 오류", example:"오늘 부서 분위기가 안 좋은 건 내가 아침에 인사를 작게 해서 그런가 봐." }
+};
 
 const PHQ9 = {
   name:"PHQ-9 (우울)", max:27,
@@ -357,12 +378,12 @@ const GAD7 = {
 const OPT_LABELS = ["전혀 없음","며칠 동안","절반 이상","거의 매일"];
 
 /* ---------- 4주 28강 커리큘럼 ---------- */
-const WEEKS = ["생각과 나 사이의 거리","감정의 문법","생각의 함정과 재평가","가치와 행동"];
+const WEEKS = ["생각과 나 사이의 마음당김","감정의 문법","생각의 함정과 재평가","가치와 행동"];
 const LESSONS = [
-{t:"왜 '거리두기'인가",b:["영화관 맨 앞줄, 스크린에 코를 박을 듯 앉아 있다고 상상해보세요. 화면이 시야 전부를 채우면 영화와 현실이 구분되지 않습니다. 무서운 장면에서는 심장이 뛰고, 슬픈 장면에서는 눈물이 납니다. 하지만 몇 줄 뒤로 물러나 앉는 순간, 우리는 알게 됩니다. '아, 이건 영화구나.'","우리의 생각도 똑같습니다. 생각 '속에' 있을 때 생각은 곧 현실처럼 느껴집니다. '나는 안 될 거야'라는 생각에 빠져 있으면, 그것은 생각이 아니라 이미 확정된 사실처럼 다가오죠. 거리두기(distancing)란 생각에서 몇 줄 뒤로 물러나 앉는 기술입니다. 생각을 없애는 것이 아니라, 생각을 '바라보는' 자리로 옮겨 앉는 것.","이 4주 동안 우리는 그 자리를 찾는 연습을 합니다. 생각과 싸우지 않고도 생각에 휘둘리지 않는 법을요."],
+{t:"왜 '마음당김'인가",b:["영화관 맨 앞줄, 스크린에 코를 박을 듯 앉아 있다고 상상해보세요. 화면이 시야 전부를 채우면 영화와 현실이 구분되지 않습니다. 무서운 장면에서는 심장이 뛰고, 슬픈 장면에서는 눈물이 납니다. 하지만 몇 줄 뒤로 물러나 앉는 순간, 우리는 알게 됩니다. '아, 이건 영화구나.'","우리의 생각도 똑같습니다. 생각 '속에' 있을 때 생각은 곧 현실처럼 느껴집니다. '나는 안 될 거야'라는 생각에 빠져 있으면, 그것은 생각이 아니라 이미 확정된 사실처럼 다가오죠. 마음당김이란 그렇게 생각 속으로 끌려 들어간 마음을 다시 나의 자리로 당겨오는 기술입니다. 생각을 없애는 것이 아니라, 마음을 '바라보는' 자리로 당겨 앉히는 것. 지금 이 순간의 나를 알아차리며 그 자리에 머무는 태도를, 우리는 마음챙김이라고 부릅니다.","이 4주 동안 우리는 그 자리를 찾는 연습을 합니다. 생각과 싸우지 않고도 생각에 휘둘리지 않는 법을요."],
 k:"생각에 빠지는 것과 생각을 바라보는 것은 완전히 다른 일이다.",
 m:"오늘 감정이 크게 흔들리는 순간이 오면, 딱 한 번만 물어보세요. \"지금 나는 어떤 생각 속에 앉아 있지?\""},
-{t:"생각은 사건이 아니다",b:["비 오는 날, 두 사람이 같은 창밖을 봅니다. 한 사람은 '소풍 다 망쳤네'라고 생각하고, 다른 사람은 '빗소리 들으며 책 읽기 좋겠다'고 생각합니다. 비는 하나인데 마음속 날씨는 둘이죠. 무엇이 달랐을까요? 사건이 아니라 해석입니다.","우리는 사건과 생각을 자주 한 덩어리로 경험합니다. 하지만 둘은 다릅니다. 사건은 카메라에 찍히는 것, 생각은 마음이 그 위에 덧입힌 자막입니다. 자막은 틀릴 수 있고, 바뀔 수 있고, 여러 버전이 존재할 수 있습니다.","생각기록지의 첫 칸이 '상황'인 이유가 여기 있습니다. 카메라로 찍듯 사실만 적어보는 것. 그 순간 이미 사건과 해석 사이에 얇은 틈이 생깁니다. 거리두기는 그 틈에서 시작됩니다."],
+{t:"생각은 사건이 아니다",b:["비 오는 날, 두 사람이 같은 창밖을 봅니다. 한 사람은 '소풍 다 망쳤네'라고 생각하고, 다른 사람은 '빗소리 들으며 책 읽기 좋겠다'고 생각합니다. 비는 하나인데 마음속 날씨는 둘이죠. 무엇이 달랐을까요? 사건이 아니라 해석입니다.","우리는 사건과 생각을 자주 한 덩어리로 경험합니다. 하지만 둘은 다릅니다. 사건은 카메라에 찍히는 것, 생각은 마음이 그 위에 덧입힌 자막입니다. 자막은 틀릴 수 있고, 바뀔 수 있고, 여러 버전이 존재할 수 있습니다.","생각기록지의 첫 칸이 '상황'인 이유가 여기 있습니다. 카메라로 찍듯 사실만 적어보는 것. 그 순간 이미 사건과 해석 사이에 얇은 틈이 생깁니다. 마음당김은 그 틈에서 시작됩니다."],
 k:"사건은 카메라에 찍히는 것, 생각은 그 위에 덧입힌 자막이다.",
 m:"오늘 있었던 일 하나를 생각기록지에 적어보세요. '상황' 칸에는 카메라에 찍힐 사실만 담아보는 게 오늘의 연습입니다."},
 {t:"자동적 사고 — 머릿속의 자동 자막",b:["인사를 건넸는데 상대가 그냥 지나칩니다. 0.5초 만에 자막이 뜹니다. '나한테 화났나?' 우리가 자막을 '선택'했나요? 아닙니다. 저절로 떠올랐죠. 인지치료에서는 이를 자동적 사고(automatic thoughts)라고 부릅니다.","자동적 사고에는 세 가지 특징이 있습니다. 첫째, 빠릅니다. 생각했다는 자각도 없이 지나갑니다. 둘째, 습관적입니다. 비슷한 상황에서 비슷한 자막이 반복됩니다. 셋째, 그럴듯합니다. 검증 없이도 사실처럼 믿게 만듭니다.","좋은 소식은, 자동이라고 해서 불변은 아니라는 것입니다. 첫걸음은 단순합니다. 자막이 떴다는 걸 알아차리는 것. 포착되지 않은 생각은 다룰 수 없지만, 포착된 생각은 다룰 수 있습니다."],
@@ -495,8 +516,8 @@ const CHATBOT_FAQ = {
     {label:"감정 강도는 어떻게 재요?", to:"record_3"},
     {label:"메인 메뉴로", to:"root"}
   ]},
-  record_2:{ pose:"2_clipboard", text:"아니요. STEP1만 저장하고 나가도 '미완성'으로 남아있어서, 홈 화면에서 이어쓰기로 다시 들어올 수 있어요. 마음이 준비됐을 때 천천히 STEP2(거리두기 질문)를 이어가시면 돼요.", options:[
-    {label:"거리두기 질문엔 뭐가 있어요?", to:"record_4"},
+  record_2:{ pose:"2_clipboard", text:"아니요. STEP1만 저장하고 나가도 '미완성'으로 남아있어서, 홈 화면에서 이어쓰기로 다시 들어올 수 있어요. 마음이 준비됐을 때 천천히 STEP2(마음당김 질문)를 이어가시면 돼요.", options:[
+    {label:"마음당김 질문엔 뭐가 있어요?", to:"record_4"},
     {label:"메인 메뉴로", to:"root"}
   ]},
   record_3:{ pose:"2_clipboard", text:"STEP1에서 슬라이더로 0~100 강도를 기록하고, STEP2에서 재평가 후 다시 한 번 재요. 두 숫자의 차이(Δ)가 기록 카드와 통계에 자동으로 표시돼요.", options:[
@@ -719,6 +740,40 @@ function renderSync(){
 /* ---------- 유틸 ---------- */
 const $ = s=>document.querySelector(s);
 function esc(str){ return String(str??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+let trapTipEl=null, trapTipDocHandler=null;
+function closeTrapTip(){
+  if(trapTipEl){ trapTipEl.remove(); trapTipEl=null; }
+  if(trapTipDocHandler){
+    document.removeEventListener("click", trapTipDocHandler, true);
+    document.removeEventListener("keydown", trapTipDocHandler, true);
+    trapTipDocHandler=null;
+  }
+}
+function showTrapTip(term, anchorEl){
+  const reopening = trapTipEl && trapTipEl.dataset.term===term;
+  closeTrapTip();
+  if(reopening) return;
+  const info=TRAP_DEFS[term]; if(!info) return;
+  const el=document.createElement("div");
+  el.className="trap-tip"; el.dataset.term=term;
+  el.innerHTML=`<b>${esc(term)}</b>${esc(info.def)}<div class="ex">예: "${esc(info.example)}"</div>`;
+  document.body.appendChild(el);
+  const r=anchorEl.getBoundingClientRect();
+  requestAnimationFrame(()=>{
+    const vw=window.innerWidth, vh=window.innerHeight;
+    let left=Math.min(Math.max(r.left,12), vw-el.offsetWidth-12);
+    let top=r.bottom+8;
+    if(top+el.offsetHeight>vh-12) top=Math.max(12, r.top-el.offsetHeight-8);
+    el.style.left=left+"px"; el.style.top=top+"px";
+    el.classList.add("show");
+  });
+  trapTipEl=el;
+  trapTipDocHandler=(e)=>{ if(e.type==="keydown"){ if(e.key==="Escape") closeTrapTip(); return; } if(!el.contains(e.target) && e.target!==anchorEl) closeTrapTip(); };
+  setTimeout(()=>{
+    document.addEventListener("click", trapTipDocHandler, true);
+    document.addEventListener("keydown", trapTipDocHandler, true);
+  },0);
+}
 function todayStr(d=new Date()){ const p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; }
 function fmtDT(iso){ const d=new Date(iso); const p=n=>String(n).padStart(2,"0"); return `${d.getMonth()+1}월 ${d.getDate()}일 ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function daysSince(dateStr){ const a=new Date(dateStr+"T00:00"), b=new Date(todayStr()+"T00:00"); return Math.round((b-a)/86400000); }
@@ -803,7 +858,7 @@ function renderHome(){
   }
   if(unfinished.length){
     tasks+=`<div class="card task" onclick="openDetail('${unfinished[unfinished.length-1].id}')">
-      <div class="tic">🪁</div><div class="tbody"><b>거리두기 이어쓰기</b><span>STEP 2가 남은 기록이 ${unfinished.length}개 있어요</span></div><div class="go">›</div></div>`;
+      <div class="tic">🪁</div><div class="tbody"><b>마음당김 이어쓰기</b><span>STEP 2가 남은 기록이 ${unfinished.length}개 있어요</span></div><div class="go">›</div></div>`;
   }
 
   $("#view").innerHTML=`
@@ -867,7 +922,7 @@ function openWizard(entryId){
     <textarea id="w-beh" style="min-height:64px"></textarea>
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="btn btn-soft" style="flex:1" onclick="saveStep1(false)">여기까지 저장</button>
-      <button class="btn btn-primary" style="flex:1.4" onclick="saveStep1(true)">거리두기로 →</button>
+      <button class="btn btn-primary" style="flex:1.4" onclick="saveStep1(true)">마음당김으로 →</button>
     </div>`);
   m.querySelectorAll(".chipwrap .chip").forEach(c=>c.onclick=()=>c.classList.toggle("on"));
 }
@@ -892,7 +947,7 @@ function saveStep1(goStep2){
 function openStep2(id){
   const e=S.entries.find(x=>x.id===id); if(!e) return;
   const m=openModal(`
-    ${mhead("생각기록 · STEP 2 거리두기")}
+    ${mhead("생각기록 · STEP 2 마음당김")}
     <div class="card" style="background:var(--green-soft);border:none">
       <div class="muted" style="color:var(--green)">다루려는 생각</div>
       <b>${esc(e.thought||e.situation||"기록된 생각")}</b>
@@ -910,8 +965,8 @@ function openStep2(id){
     <label class="f">지금의 감정 강도 <small>처음엔 <b>${e.intensity}</b>이었어요. 지금은 어떤가요?</small></label>
     <div class="slider-val" id="s2-int-val">${e.intensity}</div>
     <input type="range" id="s2-int" min="0" max="100" value="${e.intensity}" oninput="$('#s2-int-val').textContent=this.value">
-    <button class="btn btn-primary btn-block" style="margin-top:20px" onclick="saveStep2('${e.id}')">거리두기 완료</button>`);
-  m.querySelectorAll("#s2-traps .chip").forEach(c=>c.onclick=()=>c.classList.toggle("on"));
+    <button class="btn btn-primary btn-block" style="margin-top:20px" onclick="saveStep2('${e.id}')">마음당김 완료</button>`);
+  m.querySelectorAll("#s2-traps .chip").forEach(c=>c.onclick=()=>{ c.classList.toggle("on"); showTrapTip(c.dataset.v, c); });
 }
 function saveStep2(id){
   const e=S.entries.find(x=>x.id===id); if(!e) return;
@@ -923,7 +978,7 @@ function saveStep2(id){
   };
   markActivity(); save(); closeModal();
   const d=e.intensity-e.step2.intensityAfter;
-  toast(d>0?`거리두기 완료 · 감정 강도가 ${d}점 내려갔어요`:"거리두기 완료 · 기록이 저장됐어요");
+  toast(d>0?`마음당김 완료 · 감정 강도가 ${d}점 내려갔어요`:"마음당김 완료 · 기록이 저장됐어요");
   openDetail(id);
 }
 
@@ -946,11 +1001,11 @@ function openDetail(id){
         <b class="k">Q2 · 친구에게라면</b><div class="v">${esc(s2.q2)||"—"}</div>
         <b class="k">Q3 · 거리의 문장</b><div class="v">${esc(s2.q3)||"—"}</div>
         <b class="k">재평가된 생각</b><div class="v">${esc(s2.reappraisal)||"—"}</div>
-        <b class="k">생각의 함정</b><div>${(s2.traps||[]).map(x=>`<span class="pill amber">${esc(x)}</span>`).join("")||"—"}</div>
+        <b class="k">생각의 함정</b><div>${(s2.traps||[]).map(x=>`<span class="pill amber" onclick="showTrapTip('${x}',this)">${esc(x)}</span>`).join("")||"—"}</div>
         <div style="margin-top:14px">${deltaBadge(e.intensity,s2.intensityAfter)}</div>
       `:`
         <div class="divider"></div>
-        <button class="btn btn-soft btn-block" onclick="openStep2('${e.id}')">🪁 STEP 2 거리두기 이어서 하기</button>
+        <button class="btn btn-soft btn-block" onclick="openStep2('${e.id}')">🪁 STEP 2 마음당김 이어서 하기</button>
       `}
       <div class="divider"></div>
       <button class="btn btn-primary btn-block" onclick="copyCoachPrompt('${e.id}')">🤖 클로드 코치에게 가져가기</button>
@@ -984,7 +1039,7 @@ function contextSummary(){
   const lastG=[...S.assessments].reverse().find(a=>a.type==="GAD7");
   return `- 최근 2주 생각기록: ${recent.length}건
 - 자주 등장한 감정: ${topEmo}
-- 거리두기(재평가) 후 감정 강도 변화: ${avgD===null?"데이터 없음":"평균 "+avgD+"점 감소"}
+- 마음당김(재평가) 후 감정 강도 변화: ${avgD===null?"데이터 없음":"평균 "+avgD+"점 감소"}
 - 최근 자가점검: PHQ-9 ${lastP?lastP.total+"점 ("+lastP.date+")":"미실시"} / GAD-7 ${lastG?lastG.total+"점 ("+lastG.date+")":"미실시"}
 - 배움 코스 진행: ${S.lessons.completed.length}/28강`;
 }
@@ -996,13 +1051,13 @@ function entryText(e){
 [감정] ${(e.emotions||[]).join(", ")||"-"} (강도 ${e.intensity}/100)
 [신체반응] ${(e.body||[]).join(", ")||"-"}
 [행동] ${e.behavior||"-"}` + (s2?`
-[거리두기 Q1 · 근거와 반대 근거] ${s2.q1||"-"}
-[거리두기 Q2 · 친구에게라면] ${s2.q2||"-"}
-[거리두기 Q3 · 거리의 문장] ${s2.q3||"-"}
+[마음당김 Q1 · 근거와 반대 근거] ${s2.q1||"-"}
+[마음당김 Q2 · 친구에게라면] ${s2.q2||"-"}
+[마음당김 Q3 · 거리의 문장] ${s2.q3||"-"}
 [재평가된 생각] ${s2.reappraisal||"-"}
 [발견한 생각의 함정] ${(s2.traps||[]).join(", ")||"-"}
 [재평가 후 감정 강도] ${s2.intensityAfter}/100 (변화: ${e.intensity-s2.intensityAfter>0?"-":"+"}${Math.abs(e.intensity-s2.intensityAfter)})`:`
-[거리두기 STEP 2] 아직 작성하지 않음`);
+[마음당김 STEP 2] 아직 작성하지 않음`);
 }
 function copyCoachPrompt(id){
   const e=S.entries.find(x=>x.id===id); if(!e)return;
@@ -1073,7 +1128,7 @@ function renderLearn(){
   }
   $("#view").innerHTML=`
     <div class="card" style="background:var(--green);color:#fff;border:none">
-      <h3 style="color:#fff">4주 거리두기 코스</h3>
+      <h3 style="color:#fff">4주 마음당김 코스</h3>
       <p style="font-size:13px;opacity:.9">하루 한 강, 5분의 배움과 하나의 미션.</p>
       <div class="progressbar" style="background:rgba(255,255,255,.25)"><i style="width:${Math.round(done/28*100)}%;background:#fff"></i></div>
       <div style="font-size:12.5px;opacity:.9">${done} / 28강 완료 · 오늘은 ${unlockedDay()}일차</div>
@@ -1295,13 +1350,13 @@ function renderStats(){
   const notes=S.entries.filter(e=>e.coachNote).slice(-5).reverse();
 
   $("#view").innerHTML=`
-    <div class="eyebrow">거리두기의 효과</div>
+    <div class="eyebrow">마음당김의 효과</div>
     <div class="card" style="text-align:center">
       ${avgD!==null?`
-        <div class="muted">거리두기 후, 감정 강도가 평균</div>
+        <div class="muted">마음당김 후, 감정 강도가 평균</div>
         <div class="score-big">${avgD>0?"−":"+"}${Math.abs(avgD)}<span style="font-size:16px;color:var(--ink-soft)">점</span></div>
-        <div class="muted">${withS2.length}번의 거리두기 기록 기준</div>`
-      :`<div class="muted" style="padding:8px 0">STEP 2까지 완료한 기록이 쌓이면<br>거리두기의 효과가 숫자로 보여요.</div>`}
+        <div class="muted">${withS2.length}번의 마음당김 기록 기준</div>`
+      :`<div class="muted" style="padding:8px 0">STEP 2까지 완료한 기록이 쌓이면<br>마음당김의 효과가 숫자로 보여요.</div>`}
     </div>
     <div class="statgrid">
       <div class="statbox"><div class="n">${S.entries.length}</div><div class="l">생각기록</div></div>
@@ -1323,7 +1378,7 @@ function renderStats(){
       <b style="font-size:14px">자주 만난 감정 TOP 3</b>
       <div style="margin:6px 0 12px">${topEmo.length?topEmo.map(x=>`<span class="pill">${esc(x[0])} · ${x[1]}회</span>`).join(""):"<span class='muted'>아직 데이터가 없어요</span>"}</div>
       <b style="font-size:14px">자주 걸린 생각의 함정 TOP 3</b>
-      <div style="margin-top:6px">${topTrap.length?topTrap.map(x=>`<span class="pill amber">${esc(x[0])} · ${x[1]}회</span>`).join(""):"<span class='muted'>아직 데이터가 없어요</span>"}</div>
+      <div style="margin-top:6px">${topTrap.length?topTrap.map(x=>`<span class="pill amber" onclick="showTrapTip('${x[0]}',this)">${esc(x[0])} · ${x[1]}회</span>`).join(""):"<span class='muted'>아직 데이터가 없어요</span>"}</div>
     </div>
     <div class="eyebrow">클로드 코치와 회고</div>
     <div class="card">
